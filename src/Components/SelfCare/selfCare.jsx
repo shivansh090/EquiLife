@@ -51,7 +51,7 @@ function SelfCareResources() {
             {categories.map(category => (
               <Badge 
                 key={category} 
-                variant={selectedCategory === category ? "default" : "outline"}
+                variant={selectedCategory === category ? "destructive" : "outline"}
                 className="cursor-pointer"
                 onClick={() => setSelectedCategory(category)}
               >

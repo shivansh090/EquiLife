@@ -4,19 +4,19 @@ import { Link } from 'react-router-dom'
 export const Navbar = () => {
   return (
     <header className="flex px-10 py-2 justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Mental Health Tracker</h1>
+        <Link to='/'><h1 className="text-2xl font-bold">Mental Health Tracker</h1></Link>
         <nav>
           <Button variant="ghost" asChild className="mr-2">
-            <Link href="/journal">Mood Journal</Link>
+            <Link to="/diary">Add Journal</Link>
           </Button>
           <Button variant="ghost" asChild className="mr-2">
-            <Link href="/history">History</Link>
+            <Link to="/analytics">Analytics</Link>
           </Button>
           <Button variant="ghost" asChild className="mr-2">
-            <Link href="/resources">Resources</Link>
+            <Link to="/self-care">Resources</Link>
           </Button>
           <Button variant="ghost" asChild>
-            <Link href="/profile">Profile</Link>
+            <Link to="/profile">Profile</Link>
           </Button>
         </nav>
       </header>
