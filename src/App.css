@@ -2,3 +2,55 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@keyframes slideIn {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes slideOut {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+  
+  .sheet-content-wrapper {
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  .sheet-content-wrapper[data-state="closed"] {
+    animation: slideOut 0.3s ease-in;
+  }
+  
+  .sheet-overlay {
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .sheet-overlay[data-state="closed"] {
+    animation: fadeOut 0.3s ease-in;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }

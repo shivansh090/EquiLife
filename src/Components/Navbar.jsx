@@ -1,24 +1,72 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Button } from './ui/button'
 import { Link } from 'react-router-dom'
+import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
+import { Menu } from 'lucide-react'
+
 export const Navbar = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+  const navItems = [
+    { to: "/diary", label: "Add Journal" },
+    { to: "/analytics", label: "Analytics" },
+    { to: "/self-care", label: "Resources" },
+    { to: "/profile", label: "Profile" },
+  ]
+
+  const NavLinks = ({ className = "", onClick = () => {} }) => (
+    <>
+      {navItems.map((item, index) => (
+        <Button 
+          key={index} 
+          variant="ghost" 
+          asChild 
+          className={`${className} transition-all duration-300 ease-in-out hover:bg-secondary`} 
+          onClick={onClick}
+        >
+          <Link to={item.to}>{item.label}</Link>
+        </Button>
+      ))}
+    </>
+  )
+
   return (
-    <header className="flex px-10 py-2 justify-between items-center mb-6">
-        <Link to='/'><h1 className="text-2xl font-bold">Mental Health Tracker</h1></Link>
-        <nav>
-          <Button variant="ghost" asChild className="mr-2">
-            <Link to="/diary">Add Journal</Link>
+    <header className="flex px-4 sm:px-10 py-2 justify-between items-center mb-6">
+      <Link to='/'>
+        <h1 className="sm:text-2xl text-lg  font-bold transition-colors duration-300 ease-in-out hover:text-primary">
+          Mental Health Tracker
+        </h1>
+      </Link>
+      
+      {/* Desktop Navigation */}
+      <nav className="hidden md:flex space-x-2">
+        <NavLinks />
+      </nav>
+
+      {/* Mobile Navigation */}
+      <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+        <SheetTrigger asChild className="md:hidden">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="transition-all duration-300 ease-in-out hover:bg-secondary"
+          >
+            <Menu className="h-6 w-6" />
+            <span className="sr-only">Toggle menu</span>
           </Button>
-          <Button variant="ghost" asChild className="mr-2">
-            <Link to="/analytics">Analytics</Link>
-          </Button>
-          <Button variant="ghost" asChild className="mr-2">
-            <Link to="/self-care">Resources</Link>
-          </Button>
-          <Button variant="ghost" asChild>
-            <Link to="/profile">Profile</Link>
-          </Button>
-        </nav>
-      </header>
+        </SheetTrigger>
+        <SheetContent 
+          side="right" 
+          className="w-[240px] sm:w-[300px] sheet-content-wrapper"
+        >
+          <nav className="flex flex-col gap-4 mt-8">
+            <NavLinks 
+              className="w-full justify-start transition-all duration-300 ease-in-out hover:translate-x-2" 
+              onClick={() => setIsSidebarOpen(false)} 
+            />
+          </nav>
+        </SheetContent>
+      </Sheet>
+    </header>
   )
 }

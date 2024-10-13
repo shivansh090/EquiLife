@@ -5,11 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress"
 import { Smile, Frown, Sun, Moon, CloudRain, Trophy, TrendingUp } from "lucide-react"
 
-import { Line, LineChart, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { Line, LineChart, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts"
 
 export default function Dashboard() {
-  // Hardcoded data for demonstration
+  // Hardcoded data (unchanged)
   const currentMood = "Feeling good"
   const moodScore = 72
   const activities = [
@@ -19,7 +18,6 @@ export default function Dashboard() {
   ]
   const quote = "Believe you can and you're halfway there. - Theodore Roosevelt"
 
-  // Mood Analysis Data
   const moodData = [
     { day: "Mon", mood: 60 },
     { day: "Tue", mood: 75 },
@@ -30,21 +28,18 @@ export default function Dashboard() {
     { day: "Sun", mood: 90 },
   ]
 
-  // Productivity Patterns Data
   const productivityData = [
     { name: "Productive", value: 65 },
     { name: "Procrastination", value: 35 },
   ]
   const COLORS = ["#0088FE", "#FF8042"]
 
-  // Goal Achievement Data
   const goals = [
     { name: "Exercise 3x/week", progress: 66 },
     { name: "Read 20 pages/day", progress: 80 },
     { name: "Meditate 10 min/day", progress: 50 },
   ]
 
-  // Milestones and Accomplishments
   const milestones = [
     "7-day mood improvement streak",
     "Completed 30 days of journaling",
@@ -52,8 +47,9 @@ export default function Dashboard() {
   ]
 
   return (
-    <div className="container sm:p-10 max-w-[1300px] mx-auto p-4">
+    <div className="container mx-auto p-4 sm:p-8 max-w-6xl">
       <main className="grid gap-6 md:grid-cols-2">
+        {/* Current Mood and Activity Suggestions cards remain unchanged */}
         <Card>
           <CardHeader>
             <CardTitle>Current Mood</CardTitle>
@@ -85,80 +81,54 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        {/* Updated Mood Analysis card */}
+        <Card className="col-span-full md:col-span-1">
           <CardHeader>
             <CardTitle>Mood Analysis</CardTitle>
             <CardDescription>Your mood patterns over the past week</CardDescription>
           </CardHeader>
-          <CardContent>
-            <ChartContainer
-              config={{
-                mood: {
-                  label: "Mood",
-                  color: "hsl(var(--chart-1))",
-                },
-              }}
-              className="h-[200px]"
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={moodData}>
-                  <XAxis dataKey="day" />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line type="monotone" dataKey="mood" stroke="var(--color-mood)" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartContainer>
+          <CardContent className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={moodData} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
+                <XAxis dataKey="day" tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} />
+                <Tooltip />
+                <Line type="monotone" dataKey="mood" stroke="#2a9d90" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card>
+        {/* Updated Productivity Patterns card */}
+        <Card className="col-span-full md:col-span-1">
           <CardHeader>
             <CardTitle>Productivity Patterns</CardTitle>
             <CardDescription>Your productivity overview</CardDescription>
           </CardHeader>
-          <CardContent>
-            <ChartContainer
-              config={{
-                productivity: {
-                  label: "Productivity",
-                  color: "hsl(var(--chart-1))",
-                },
-              }}
-              className="h-[200px]"
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={productivityData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {productivityData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                </PieChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-            <div className="mt-4 flex justify-around">
-              <div className="flex items-center">
-                <div className="w-3 h-3 bg-[#0088FE] rounded-full mr-2" />
-                <span>Productive</span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-3 h-3 bg-[#FF8042] rounded-full mr-2" />
-                <span>Procrastination</span>
-              </div>
-            </div>
+          <CardContent className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={productivityData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius="80%"
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {productivityData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend verticalAlign="bottom" height={36} />
+              </PieChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
 
+        {/* Goal Achievement and Milestones cards remain unchanged */}
         <Card>
           <CardHeader>
             <CardTitle>Goal Achievement</CardTitle>
