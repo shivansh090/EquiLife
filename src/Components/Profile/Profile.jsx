@@ -84,7 +84,7 @@ const MyProfile = () => {
                                             <div className="h-5 text-gray-500 bg-gray-100 rounded-full"></div>
                                         </div>
                                     ) : (
-                                        <p className={`flex gap-4 items-center ${item.desc ? 'flex gap-2 text-xl font-medium' : 'text-red-600'}`} style={{ fontWeight: "430" }}>
+                                        <p className={`flex gap-4 items-center overflow-scroll no-scrollbar ${item.desc ? 'flex gap-2 text-xl font-medium' : 'text-red-600'}`} style={{ fontWeight: "430" }}>
                                             {item.desc || "Please Verify your ID for more information"}
                                             {item.title === 'Date of Birth' &&  (item.desc ? 
                                                 <MdEdit 

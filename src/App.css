@@ -3,6 +3,9 @@
 @tailwind components;
 @tailwind utilities;
 
+.no-scrollbar{
+  scrollbar-width: none;
+}
 @keyframes slideIn {
     from {
       transform: translateX(100%);
