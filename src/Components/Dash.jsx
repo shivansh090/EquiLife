@@ -1,55 +1,93 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Smile, Frown, Sun, Moon, CloudRain, Trophy, TrendingUp } from "lucide-react"
-
-import { Line, LineChart, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts"
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Smile, Frown, Sun, Moon, CloudRain, Trophy } from "lucide-react";
+import { Line, LineChart, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 
 export default function Dashboard() {
-  // Hardcoded data (unchanged)
-  const currentMood = "Feeling good"
-  const moodScore = 72
-  const activities = [
-    { name: "Take a walk", icon: <Sun className="h-4 w-4" /> },
-    { name: "Try meditation", icon: <Moon className="h-4 w-4" /> },
-    { name: "Listen to music", icon: <CloudRain className="h-4 w-4" /> },
-  ]
-  const quote = "Believe you can and you're halfway there. - Theodore Roosevelt"
+  const [moodData, setMoodData] = useState([]);
+  const [productivityData, setProductivityData] = useState([]);
+  const [goals, setGoals] = useState([]);
+  const [currentMood, setCurrentMood] = useState("Feeling good");
+  const [moodScore, setMoodScore] = useState(72);
+  const [quote, setQuote] = useState("Believe you can and you're halfway there. - Theodore Roosevelt");
+  const [milestones, setMilestones] = useState([]);
+  const [activities, setActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const moodData = [
-    { day: "Mon", mood: 60 },
-    { day: "Tue", mood: 75 },
-    { day: "Wed", mood: 65 },
-    { day: "Thu", mood: 80 },
-    { day: "Fri", mood: 70 },
-    { day: "Sat", mood: 85 },
-    { day: "Sun", mood: 90 },
-  ]
+  const COLORS = ["#0088FE", "#FF8042"];
 
-  const productivityData = [
-    { name: "Productive", value: 65 },
-    { name: "Procrastination", value: 35 },
-  ]
-  const COLORS = ["#0088FE", "#FF8042"]
-console.log(productivityData)
-  const goals = [
-    { name: "Exercise 3x/week", progress: 66 },
-    { name: "Read 20 pages/day", progress: 80 },
-    { name: "Meditate 10 min/day", progress: 50 },
-  ]
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch("http://localhost:3000/dashboard/652f1f9b9e87a2a9f22d60b9");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        
+        // Update the state with the fetched data
+        setMoodData(data.moods.slice(-7)); // Get the last 7 mood entries
+        setProductivityData(data.productivity);
+        setGoals(data.goals.slice(0, 3)); // Get the top 3 goals
+        setMilestones(data.milestones.slice(0, 5)); // Get the top 5 milestones
+        setActivities(data.activities.slice(0, 3)); // Get the top 3 activity suggestions
+        
+        // Set the current mood and mood score based on the latest mood entry
+        if (data.moods.length > 0) {
+          const latestMood = data.moods[data.moods.length - 1];
+          setCurrentMood(`Feeling ${getMoodDescription(latestMood.mood)}`);
+          setMoodScore(latestMood.mood);
+        }
+        
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError(error.message);
+        setLoading(false);
+      }
+    };
 
-  const milestones = [
-    "7-day mood improvement streak",
-    "Completed 30 days of journaling",
-    "Achieved 8-hour sleep goal for a week",
-  ]
+    fetchData();
+  }, []);
+
+  const getMoodDescription = (score) => {
+    if (score >= 80) return "Great";
+    if (score >= 60) return "Good";
+    if (score >= 40) return "Okay";
+    if (score >= 20) return "Not so good";
+    return "Bad";
+  };
+
+  const getActivityIcon = (activity) => {
+    switch (activity.type) {
+      case "outdoor":
+        return <Sun className="h-4 w-4" />;
+      case "relaxation":
+        return <Moon className="h-4 w-4" />;
+      case "entertainment":
+        return <CloudRain className="h-4 w-4" />;
+      default:
+        return <Sun className="h-4 w-4" />;
+    }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="container mx-auto p-4 sm:p-8 max-w-6xl">
       <main className="grid gap-6 md:grid-cols-2">
-        {/* Current Mood and Activity Suggestions cards remain unchanged */}
         <Card>
           <CardHeader>
             <CardTitle>Current Mood</CardTitle>
@@ -73,7 +111,7 @@ console.log(productivityData)
             <ul className="space-y-2">
               {activities.map((activity, index) => (
                 <li key={index} className="flex items-center">
-                  {activity.icon}
+                  {getActivityIcon(activity)}
                   <span className="ml-2">{activity.name}</span>
                 </li>
               ))}
@@ -81,7 +119,6 @@ console.log(productivityData)
           </CardContent>
         </Card>
 
-        {/* Updated Mood Analysis card */}
         <Card className="col-span-full md:col-span-1">
           <CardHeader>
             <CardTitle>Mood Analysis</CardTitle>
@@ -91,7 +128,7 @@ console.log(productivityData)
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={moodData} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
                 <XAxis dataKey="day" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} />
+                <YAxis dataKey="mood" tick={{ fontSize: 12 }} />
                 <Tooltip />
                 <Line type="monotone" dataKey="mood" stroke="#2a9d90" strokeWidth={2} />
               </LineChart>
@@ -99,7 +136,6 @@ console.log(productivityData)
           </CardContent>
         </Card>
 
-        {/* Updated Productivity Patterns card */}
         <Card className="col-span-full md:col-span-1">
           <CardHeader>
             <CardTitle>Productivity Patterns</CardTitle>
@@ -128,11 +164,10 @@ console.log(productivityData)
           </CardContent>
         </Card>
 
-        {/* Goal Achievement and Milestones cards remain unchanged */}
         <Card>
           <CardHeader>
             <CardTitle>Goal Achievement</CardTitle>
-            <CardDescription>Track your progress</CardDescription>
+            <CardDescription>Track your progress (Top 3 goals)</CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="space-y-4">
@@ -152,14 +187,14 @@ console.log(productivityData)
         <Card>
           <CardHeader>
             <CardTitle>Milestones & Accomplishments</CardTitle>
-            <CardDescription>Your recent achievements</CardDescription>
+            <CardDescription>Your recent achievements (Top 5)</CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
               {milestones.map((milestone, index) => (
                 <li key={index} className="flex items-center">
                   <Trophy className="h-4 w-4 mr-2 text-yellow-500" />
-                  <span>{milestone}</span>
+                  <span>{milestone.description}</span>
                 </li>
               ))}
             </ul>
@@ -176,5 +211,5 @@ console.log(productivityData)
         </Card>
       </main>
     </div>
-  )
+  );
 }

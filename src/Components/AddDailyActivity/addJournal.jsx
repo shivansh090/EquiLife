@@ -9,39 +9,6 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Line, LineChart, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
-// Fake mood analysis function (replace with actual ML model in production)
-const analyzeMood = (text) => {
-  const moods = ['Happy', 'Sad', 'Excited', 'Anxious', 'Calm']
-  return moods[Math.floor(Math.random() * moods.length)]
-}
-
-// Fake sentiment analysis function (replace with actual NLP model in production)
-const analyzeSentiment = (text) => {
-  const sentiments = ['Positive', 'Negative', 'Neutral']
-  return {
-    score: Math.random() * 2 - 1, // Random score between -1 and 1
-    sentiment: sentiments[Math.floor(Math.random() * sentiments.length)]
-  }
-}
-
-// Fake mood triggers analysis (replace with actual analysis in production)
-const analyzeMoodTriggers = (text) => {
-  const triggers = ['work', 'family', 'exercise', 'sleep', 'food']
-  return triggers[Math.floor(Math.random() * triggers.length)]
-}
-
-// Fake happy moments analysis (replace with actual analysis in production)
-const analyzeHappyMoments = (text) => {
-  const happyMoments = ['spending time outdoors', 'meeting friends', 'accomplishing a task', 'learning something new']
-  return happyMoments[Math.floor(Math.random() * happyMoments.length)]
-}
-
-// Fake gratitude analysis (replace with actual analysis in production)
-const analyzeGratitude = (text) => {
-  const gratitudeTopics = ['health', 'family', 'friends', 'career', 'personal growth']
-  return gratitudeTopics[Math.floor(Math.random() * gratitudeTopics.length)]
-}
-
 export default function MoodJournal() {
   const [journalEntry, setJournalEntry] = useState('')
   const [moodAnalysis, setMoodAnalysis] = useState(null)
@@ -53,41 +20,82 @@ export default function MoodJournal() {
   const [moodTrend, setMoodTrend] = useState([])
 
   useEffect(() => {
-    // Initialize mood trend with some fake data
-    setMoodTrend([
-      { day: 'Mon', score: 0.2 },
-      { day: 'Tue', score: 0.5 },
-      { day: 'Wed', score: -0.3 },
-      { day: 'Thu', score: 0.8 },
-      { day: 'Fri', score: 0.1 },
-      { day: 'Sat', score: 0.9 },
-      { day: 'Sun', score: 0.6 },
-    ])
+    fetchJournalEntries();
+    fetchMoodTrend();
   }, [])
 
-  const handleSubmit = () => {
+  const fetchJournalEntries = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/journal/652f1f9b9e87a2a9f22d60b9');
+      if (!response.ok) {
+        throw new Error('Failed to fetch journal entries');
+      }
+      const data = await response.json();
+      setActivityLog(data);
+    } catch (error) {
+      console.error('Error fetching journal entries:', error);
+    }
+  };
+
+  const fetchMoodTrend = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/mood-trend/652f1f9b9e87a2a9f22d60b9');
+      if (!response.ok) {
+        throw new Error('Failed to fetch mood trend');
+      }
+      const data = await response.json();
+      setMoodTrend(data.map(item => ({ day: new Date(item.day).toLocaleDateString('en-US', { weekday: 'short' }), score: item.mood / 50 - 1 })));
+    } catch (error) {
+      console.error('Error fetching mood trend:', error);
+    }
+  };
+
+  const handleSubmit = async () => {
     if (journalEntry.trim()) {
-      const mood = analyzeMood(journalEntry)
-      const sentiment = analyzeSentiment(journalEntry)
-      const trigger = analyzeMoodTriggers(journalEntry)
-      const happy = analyzeHappyMoments(journalEntry)
-      const grateful = analyzeGratitude(journalEntry)
+      try {
+        const response = await fetch('http://localhost:3000/journal', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: '652f1f9b9e87a2a9f22d60b9',
+            content: journalEntry
+          }),
+        });
 
-      setMoodAnalysis(mood)
-      setSentimentAnalysis(sentiment)
-      setMoodTrigger(trigger)
-      setHappyMoment(happy)
-      setGratitude(grateful)
+        if (!response.ok) {
+          throw new Error('Failed to submit journal entry');
+        }
 
-      setActivityLog([{ entry: journalEntry, mood: mood, date: new Date(), sentiment: sentiment.sentiment }, ...activityLog])
-      
-      // Update mood trend
-      setMoodTrend(prevTrend => {
-        const newTrend = [...prevTrend.slice(1), { day: 'Today', score: sentiment.score }]
-        return newTrend
-      })
+        const data = await response.json();
+        const { journalEntry: newEntry } = data;
 
-      setJournalEntry('')
+        setMoodAnalysis(newEntry.mood > 50 ? 'Positive' : 'Negative');
+        setSentimentAnalysis({
+          sentiment: newEntry.sentiment > 0 ? 'Positive' : 'Negative',
+          score: newEntry.sentiment
+        });
+        setMoodTrigger(newEntry.moodTrigger);
+        setHappyMoment(newEntry.happyMoment);
+        setGratitude(newEntry.gratitude);
+
+        setActivityLog(prevLog => [newEntry, ...prevLog]);
+        
+        // Update mood trend
+        setMoodTrend(prevTrend => {
+          const newTrend = [...prevTrend.slice(1), { day: 'Today', score: newEntry.sentiment }];
+          return newTrend;
+        });
+
+        setJournalEntry('');
+
+        // Refresh journal entries and mood trend
+        fetchJournalEntries();
+        fetchMoodTrend();
+      } catch (error) {
+        console.error('Error submitting journal entry:', error);
+      }
     }
   }
 
@@ -192,11 +200,11 @@ export default function MoodJournal() {
             {activityLog.map((activity, index) => (
               <div key={index} className="mb-4 p-4 border rounded">
                 <p className="text-sm text-gray-500 mb-2">
-                  {activity.date.toLocaleString()}
+                  {new Date(activity.createdAt).toLocaleString()}
                 </p>
-                <p className="mb-2">{activity.entry}</p>
-                <p className="text-sm font-semibold">Mood: {activity.mood}</p>
-                <p className="text-sm font-semibold">Sentiment: {activity.sentiment}</p>
+                <p className="mb-2">{activity.content}</p>
+                <p className="text-sm font-semibold">Mood: {activity.mood > 50  ? 'Positive' : 'Negative'}</p>
+                <p className="text-sm font-semibold">Sentiment: {activity.sentiment > 0 ? 'Positive' : 'Negative'}</p>
               </div>
             ))}
           </ScrollArea>

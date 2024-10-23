@@ -2,6 +2,7 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import Dash from './Components/Dash'
 import Dashboard from './Components/Dashboard'
 import { Navbar } from './Components/Navbar'
 import MoodJournal from './Components/AddDailyActivity/addJournal'
@@ -16,7 +17,7 @@ function App() {
     <>
       <Navbar />
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<Dash/>} />
         <Route path="/diary" element={<MoodJournal />}/>
         <Route path='/analytics' element={<Analytics/>}/>
         <Route path='self-care' element={<SelfCareResources/>}/>
