@@ -132,18 +132,30 @@ const genAI = new GoogleGenerativeAI("AIzaSyDFg4ixtUYzPA4DyC3E1DfvCenK0DaR3Cw");
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 // Helper function to analyze journal entry using AI
-async function analyzeJournalEntry(content) {
+async function analyzeJournalEntry(content, goals) {
   const prompt = `Journal Entry:
 
 ${content}
 
-Based on this journal entry, extract mood %, 0 means very bad mood and 100 means very happy. Also find overall mood of day, happy or sad or angry or whatever. Give an activity suggestion, and give a reason for stress if any.
+Current Goals:
+${goals.map(goal => `- ${goal.name} (Current progress: ${goal.progress}%)`).join('\n')}
+
+Based on this journal entry and the current goals, please provide the following:
+1. Mood percentage (0-100, where 0 is very bad and 100 is very happy)
+2. Overall mood of the day (e.g., happy, sad, angry, etc.)
+3. An activity suggestion
+4. A reason for stress (if any)
+5. Goal achievements, progress updates, or new goals mentioned (if any)
 
 Return the result in an object with the following key-value pairs:
 - moodPercentage: number
 - overallMood: string
 - activitySuggestion: string
 - stressReason: string (keep this empty if there isn't any stress mentioned)
+- goalUpdates: array of objects, each containing:
+  - name: string (name of the goal)
+  - progressUpdate: number (new progress percentage)
+  - achieved: boolean (true if the goal was fully achieved, false otherwise)
 
 Don't return any other prompt, just return the object.`;
 
@@ -194,15 +206,17 @@ app.post("/journal", async (req, res) => {
   const { userId, content } = req.body;
 
   try {
-    // Analyze the journal entry using AI
-    const analysis = await analyzeJournalEntry(content);
+    // Fetch current goals for the user
+    const currentGoals = await Goal.find({ userId });
 
+    // Analyze the journal entry using AI
+    const analysis = await analyzeJournalEntry(content, currentGoals);
+    console.log(analysis)
     // Save mood data
     const newMood = new Mood({ userId, day: new Date().toLocaleDateString(), mood: analysis.moodPercentage });
     await newMood.save();
 
     // Update productivity data
-    // For simplicity, we'll use the mood percentage as a proxy for productivity
     const productiveScore = analysis.moodPercentage;
     const procrastinationScore = 100 - productiveScore;
     await Productivity.updateOne({ userId, name: "Productive" }, { value: productiveScore }, { upsert: true });
@@ -215,6 +229,52 @@ app.post("/journal", async (req, res) => {
       type: "ai-suggested"
     });
     await newActivity.save();
+
+    // Update or create goals based on AI analysis
+    for (const goalUpdate of analysis.goalUpdates) {
+      // Check if the goal exists in the database
+      const existingGoal = await Goal.findOne({ userId, name: goalUpdate.name });
+    
+      if (!existingGoal || goalUpdate.isNewGoal) {
+        // Create a new goal if it doesn't exist or is marked as new
+        const newGoal = new Goal({
+          userId,
+          name: goalUpdate.name,
+          progress: goalUpdate.progressUpdate || 0,
+          achieved: goalUpdate.achieved || false,
+        });
+        await newGoal.save();
+    
+        // Create a new milestone for the new goal
+        const newMilestone = new Milestone({
+          userId,
+          description: goalUpdate.achieved?'Achived Goal:':`New goal created:` +`${newGoal.name}`,
+        });
+        await newMilestone.save();
+      } else {
+        // Update existing goal progress
+        const updatedGoal = await Goal.findOneAndUpdate(
+          { userId, name: goalUpdate.name },
+          {
+            $set: {
+              progress: goalUpdate.progressUpdate !== null ? goalUpdate.progressUpdate : existingGoal.progress,
+              achieved: goalUpdate.achieved,
+            },
+          },
+          { new: true }
+        );
+    
+        if (updatedGoal && goalUpdate.achieved) {
+          // Create a milestone for the achieved goal
+          const newMilestone = new Milestone({
+            userId,
+            description: `Achieved goal: ${updatedGoal.name}`,
+          });
+          await newMilestone.save();
+        }
+      }
+    }
+    
 
     // Save the journal entry
     const newJournalEntry = new JournalEntry({

@@ -77,8 +77,22 @@ export default function MoodJournal() {
           score: (analysis.moodPercentage / 50) - 1
         });
         setMoodTrigger(analysis.stressReason || null);
-        setHappyMoment(null); // This isn't provided by the current AI analysis
-        setGratitude(null); // This isn't provided by the current AI analysis
+  
+        // Display goal updates
+        if (analysis.goalUpdates && analysis.goalUpdates.length > 0) {
+          const goalUpdateMessages = analysis.goalUpdates.map(update => {
+            if (update.isNewGoal) {
+              return `New goal created: ${update.name}`;
+            } else if (update.achieved) {
+              return `Goal achieved: ${update.name}`;
+            } else if (update.progressUpdate !== null) {
+              return `Goal progress updated: ${update.name} (${update.progressUpdate}%)`;
+            }
+          }).filter(Boolean);
+          
+          // You might want to create a new state variable for goal updates and set it here
+          setGoalUpdates(goalUpdateMessages);
+        }
   
         setActivityLog(prevLog => [newEntry, ...prevLog]);
         
