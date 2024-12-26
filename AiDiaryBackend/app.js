@@ -102,7 +102,7 @@ const cors = require('cors');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/todoApptest', {
+mongoose.connect('mongodb://localhost:27017/todoApp', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -146,6 +146,7 @@ Based on this journal entry and the current goals, please provide the following:
 3. An activity suggestion
 4. A reason for stress (if any)
 5. Goal achievements, progress updates, or new goals mentioned (if any)
+6. Any significant milestones or achievements mentioned in the journal entry (independent of goals)
 
 Return the result in an object with the following key-value pairs:
 - moodPercentage: number
@@ -154,8 +155,10 @@ Return the result in an object with the following key-value pairs:
 - stressReason: string (keep this empty if there isn't any stress mentioned)
 - goalUpdates: array of objects, each containing:
   - name: string (name of the goal)
-  - progressUpdate: number (new progress percentage)
+  - progressUpdate: number (new progress percentage, or null if no update)
   - achieved: boolean (true if the goal was fully achieved, false otherwise)
+  - isNewGoal: boolean (true if this is a newly mentioned goal, false for existing goals)
+- milestones: array of strings, each describing a significant milestone or achievement mentioned in the journal entry
 
 Don't return any other prompt, just return the object.`;
 
@@ -211,7 +214,7 @@ app.post("/journal", async (req, res) => {
 
     // Analyze the journal entry using AI
     const analysis = await analyzeJournalEntry(content, currentGoals);
-    console.log(analysis)
+
     // Save mood data
     const newMood = new Mood({ userId, day: new Date().toLocaleDateString(), mood: analysis.moodPercentage });
     await newMood.save();
@@ -232,49 +235,47 @@ app.post("/journal", async (req, res) => {
 
     // Update or create goals based on AI analysis
     for (const goalUpdate of analysis.goalUpdates) {
-      // Check if the goal exists in the database
-      const existingGoal = await Goal.findOne({ userId, name: goalUpdate.name });
-    
-      if (!existingGoal || goalUpdate.isNewGoal) {
-        // Create a new goal if it doesn't exist or is marked as new
+      if (goalUpdate.isNewGoal) {
+        // Create a new goal
         const newGoal = new Goal({
           userId,
           name: goalUpdate.name,
           progress: goalUpdate.progressUpdate || 0,
-          achieved: goalUpdate.achieved || false,
+          achieved: goalUpdate.achieved || false
         });
         await newGoal.save();
-    
-        // Create a new milestone for the new goal
-        const newMilestone = new Milestone({
-          userId,
-          description: goalUpdate.achieved?'Achived Goal:':`New goal created:` +`${newGoal.name}`,
-        });
-        await newMilestone.save();
       } else {
-        // Update existing goal progress
+        // Update existing goal
         const updatedGoal = await Goal.findOneAndUpdate(
           { userId, name: goalUpdate.name },
-          {
-            $set: {
-              progress: goalUpdate.progressUpdate !== null ? goalUpdate.progressUpdate : existingGoal.progress,
-              achieved: goalUpdate.achieved,
-            },
+          { 
+            $set: { 
+              progress: goalUpdate.progressUpdate !== null ? goalUpdate.progressUpdate : 100,
+              achieved: goalUpdate.achieved
+            }
           },
           { new: true }
         );
-    
+
         if (updatedGoal && goalUpdate.achieved) {
-          // Create a milestone for the achieved goal
+          // Create a new milestone for achieved goal
           const newMilestone = new Milestone({
             userId,
-            description: `Achieved goal: ${updatedGoal.name}`,
+            description: `Achieved goal: ${updatedGoal.name}`
           });
           await newMilestone.save();
         }
       }
     }
-    
+
+    // Save milestones detected by AI
+    for (const milestoneDescription of analysis.milestones) {
+      const newMilestone = new Milestone({
+        userId,
+        description: milestoneDescription
+      });
+      await newMilestone.save();
+    }
 
     // Save the journal entry
     const newJournalEntry = new JournalEntry({

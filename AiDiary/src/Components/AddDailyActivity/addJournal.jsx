@@ -78,21 +78,29 @@ export default function MoodJournal() {
         });
         setMoodTrigger(analysis.stressReason || null);
   
-        // Display goal updates
+        // Display goal updates and milestones
+        const updateMessages = [];
+  
         if (analysis.goalUpdates && analysis.goalUpdates.length > 0) {
-          const goalUpdateMessages = analysis.goalUpdates.map(update => {
+          analysis.goalUpdates.forEach(update => {
             if (update.isNewGoal) {
-              return `New goal created: ${update.name}`;
+              updateMessages.push(`New goal created: ${update.name}`);
             } else if (update.achieved) {
-              return `Goal achieved: ${update.name}`;
+              updateMessages.push(`Goal achieved: ${update.name}`);
             } else if (update.progressUpdate !== null) {
-              return `Goal progress updated: ${update.name} (${update.progressUpdate}%)`;
+              updateMessages.push(`Goal progress updated: ${update.name} (${update.progressUpdate}%)`);
             }
-          }).filter(Boolean);
-          
-          // You might want to create a new state variable for goal updates and set it here
-          setGoalUpdates(goalUpdateMessages);
+          });
         }
+  
+        if (analysis.milestones && analysis.milestones.length > 0) {
+          analysis.milestones.forEach(milestone => {
+            updateMessages.push(`New milestone: ${milestone}`);
+          });
+        }
+        
+        // You might want to create a new state variable for updates and set it here
+        setUpdates(updateMessages);
   
         setActivityLog(prevLog => [newEntry, ...prevLog]);
         
