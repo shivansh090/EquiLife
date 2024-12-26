@@ -18,7 +18,8 @@ export default function MoodJournal() {
   const [gratitude, setGratitude] = useState(null)
   const [activityLog, setActivityLog] = useState([])
   const [moodTrend, setMoodTrend] = useState([])
-
+  const userId = localStorage.getItem("user");
+  const token = localStorage.getItem("authToken");
   useEffect(() => {
     fetchJournalEntries();
     fetchMoodTrend();
@@ -26,7 +27,14 @@ export default function MoodJournal() {
 
   const fetchJournalEntries = async () => {
     try {
-      const response = await fetch('http://localhost:3000/journal/652f1f9b9e87a2a9f22d60b9');
+      const response = await fetch(`http://localhost:3000/journal`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`, // Send the JWT token in the Authorization header
+          },
+    });
       if (!response.ok) {
         throw new Error('Failed to fetch journal entries');
       }
@@ -39,7 +47,14 @@ export default function MoodJournal() {
 
   const fetchMoodTrend = async () => {
     try {
-      const response = await fetch('http://localhost:3000/mood-trend/652f1f9b9e87a2a9f22d60b9');
+      const response = await fetch(`http://localhost:3000/mood-trend`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`, // Send the JWT token in the Authorization header
+          },
+    });
       if (!response.ok) {
         throw new Error('Failed to fetch mood trend');
       }
@@ -57,9 +72,10 @@ export default function MoodJournal() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            "Authorization": `Bearer ${token}`, 
           },
           body: JSON.stringify({
-            userId: '652f1f9b9e87a2a9f22d60b9',
+            userId,
             content: journalEntry
           }),
         });
