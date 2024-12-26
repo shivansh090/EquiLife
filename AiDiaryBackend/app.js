@@ -100,9 +100,11 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/todoApp', {
+mongoose.connect('mongodb://localhost:27017/todoApptest', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -130,6 +132,26 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Initialize Google Generative AI
 const genAI = new GoogleGenerativeAI("AIzaSyDFg4ixtUYzPA4DyC3E1DfvCenK0DaR3Cw");
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+// JWT Secret
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
+
+// Authentication Middleware
+const authMiddleware = (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
+
+  if (!token) {
+    return res.status(401).json({ error: 'No token, authorization denied' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded.user;
+    next();
+  } catch (err) {
+    res.status(401).json({ error: 'Token is not valid' });
+  }
+};
 
 // Helper function to analyze journal entry using AI
 async function analyzeJournalEntry(content, goals) {
@@ -178,12 +200,86 @@ Don't return any other prompt, just return the object.`;
   }
 }
 
-// Routes
+// Authentication Routes
+
+// Signup
+app.post('/api/signup', async (req, res) => {
+  const { username, email, password } = req.body;
+
+  try {
+    let user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({ error: 'User already exists' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    user = new User({
+      username,
+      email,
+      password: hashedPassword
+    });
+
+    await user.save();
+
+    const payload = {
+      user: {
+        id: user.id
+      }
+    };
+
+    jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
+      if (err) throw err;
+      res.json({ token });
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// Login
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    let user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid Credentials' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Invalid Credentials' });
+    }
+
+    const payload = {
+      user: {
+        id: user.id
+      }
+    };
+
+    jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
+      if (err) throw err;
+      res.json({ token, payload });
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// Logout (Note: JWT is stateless, so we'll just return a success message)
+app.post('/api/logout', (req, res) => {
+  res.json({ message: 'Logged out successfully' });
+});
+
+// Protected Routes (use authMiddleware)
 
 // Get Dashboard Data
-app.get("/dashboard/:userId", async (req, res) => {
-  const { userId } = req.params;
-
+app.get("/dashboard", authMiddleware, async (req, res) => {
+  const userId = req.user.id;
   try {
     const moods = await Mood.find({ userId }).sort({ createdAt: -1 }).limit(7);
     const productivity = await Productivity.find({ userId });
@@ -205,8 +301,9 @@ app.get("/dashboard/:userId", async (req, res) => {
 });
 
 // Add New Journal Entry
-app.post("/journal", async (req, res) => {
-  const { userId, content } = req.body;
+app.post("/journal", authMiddleware, async (req, res) => {
+  const userId = req.user.id;
+  const { content } = req.body;
 
   try {
     // Fetch current goals for the user
@@ -214,7 +311,6 @@ app.post("/journal", async (req, res) => {
 
     // Analyze the journal entry using AI
     const analysis = await analyzeJournalEntry(content, currentGoals);
-
     // Save mood data
     const newMood = new Mood({ userId, day: new Date().toLocaleDateString(), mood: analysis.moodPercentage });
     await newMood.save();
@@ -300,8 +396,8 @@ app.post("/journal", async (req, res) => {
 });
 
 // Get Journal Entries
-app.get("/journal/:userId", async (req, res) => {
-  const { userId } = req.params;
+app.get("/journal", authMiddleware, async (req, res) => {
+  const userId = req.user.id;
 
   try {
     const journalEntries = await JournalEntry.find({ userId }).sort({ createdAt: -1 }).limit(10);
@@ -313,8 +409,8 @@ app.get("/journal/:userId", async (req, res) => {
 });
 
 // Get Mood Trend
-app.get("/mood-trend/:userId", async (req, res) => {
-  const { userId } = req.params;
+app.get("/mood-trend", authMiddleware, async (req, res) => {
+  const userId = req.user.id;
 
   try {
     const moodTrend = await Mood.find({ userId }).sort({ createdAt: -1 }).limit(7);
