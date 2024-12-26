@@ -8,8 +8,9 @@ export const Navbar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   const navItems = [
+    { to: "/", label: "Dashboard" },
     { to: "/diary", label: "Add Journal" },
-    { to: "/analytics", label: "Analytics" },
+    // { to: "/analytics", label: "Analytics" },
     { to: "/self-care", label: "Resources" },
     { to: "/profile", label: "Profile" },
   ]

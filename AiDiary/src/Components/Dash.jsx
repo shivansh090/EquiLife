@@ -40,7 +40,7 @@ export default function Dashboard() {
         
         // Set the current mood and mood score based on the latest mood entry
         if (data.moods.length > 0) {
-          const latestMood = data.moods[data.moods.length - 1];
+          const latestMood = data.moods[0];
           setCurrentMood(`Feeling ${getMoodDescription(latestMood.mood)}`);
           setMoodScore(latestMood.mood);
         }
@@ -184,7 +184,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle>Milestones & Accomplishments</CardTitle>
             <CardDescription>Your recent achievements (Top 5)</CardDescription>
@@ -199,9 +199,9 @@ export default function Dashboard() {
               ))}
             </ul>
           </CardContent>
-        </Card>
+        </Card> */}
 
-        <Card className="md:col-span-2">
+        <Card >
           <CardHeader>
             <CardTitle>Daily Inspiration</CardTitle>
           </CardHeader>

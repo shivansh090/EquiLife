@@ -63,33 +63,33 @@ export default function MoodJournal() {
             content: journalEntry
           }),
         });
-
+  
         if (!response.ok) {
           throw new Error('Failed to submit journal entry');
         }
-
+  
         const data = await response.json();
-        const { journalEntry: newEntry } = data;
-
-        setMoodAnalysis(newEntry.mood > 50 ? 'Positive' : 'Negative');
+        const { journalEntry: newEntry, analysis } = data;
+  
+        setMoodAnalysis(analysis.overallMood);
         setSentimentAnalysis({
-          sentiment: newEntry.sentiment > 0 ? 'Positive' : 'Negative',
-          score: newEntry.sentiment
+          sentiment: analysis.moodPercentage > 50 ? 'Positive' : 'Negative',
+          score: (analysis.moodPercentage / 50) - 1
         });
-        setMoodTrigger(newEntry.moodTrigger);
-        setHappyMoment(newEntry.happyMoment);
-        setGratitude(newEntry.gratitude);
-
+        setMoodTrigger(analysis.stressReason || null);
+        setHappyMoment(null); // This isn't provided by the current AI analysis
+        setGratitude(null); // This isn't provided by the current AI analysis
+  
         setActivityLog(prevLog => [newEntry, ...prevLog]);
         
         // Update mood trend
         setMoodTrend(prevTrend => {
-          const newTrend = [...prevTrend.slice(1), { day: 'Today', score: newEntry.sentiment }];
+          const newTrend = [...prevTrend.slice(1), { day: 'Today', score: (analysis.moodPercentage / 50) - 1 }];
           return newTrend;
         });
-
+  
         setJournalEntry('');
-
+  
         // Refresh journal entries and mood trend
         fetchJournalEntries();
         fetchMoodTrend();
