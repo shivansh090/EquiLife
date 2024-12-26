@@ -95,14 +95,14 @@
 //   }
 // });
 
-
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/todoApp', {
+mongoose.connect('mongodb://localhost:27017/todoApptest', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -126,6 +126,42 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// Initialize Google Generative AI
+const genAI = new GoogleGenerativeAI("YOUR_GEMINI_API_KEY");
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+// Helper function to analyze journal entry using AI
+async function analyzeJournalEntry(content) {
+  const prompt = `Journal Entry:
+
+${content}
+
+Based on this journal entry, extract mood %, 0 means very bad mood and 100 means very happy. Also find overall mood of day, happy or sad or angry or whatever. Give an activity suggestion, and give a reason for stress if any.
+
+Return the result in an object with the following key-value pairs:
+- moodPercentage: number
+- overallMood: string
+- activitySuggestion: string
+- stressReason: string (keep this empty if there isn't any stress mentioned)
+
+Don't return any other prompt, just return the object.`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    let responseText = result.response?.text();
+
+    // Clean the response text to extract valid JSON
+    responseText = responseText.trim();
+    responseText = responseText.replace(/```json/g, "").replace(/```/g, "");
+
+    // Parse the cleaned response text as JSON
+    return JSON.parse(responseText);
+  } catch (error) {
+    console.error("Error analyzing journal entry:", error);
+    throw error;
+  }
+}
 
 // Routes
 
@@ -158,66 +194,43 @@ app.post("/journal", async (req, res) => {
   const { userId, content } = req.body;
 
   try {
-    // In a real-world scenario, you would process the journal entry with an AI model here
-    // For now, we'll simulate the AI processing by adding random data
+    // Analyze the journal entry using AI
+    const analysis = await analyzeJournalEntry(content);
 
-    // Simulate mood analysis
-    const moodScore = Math.floor(Math.random() * 100) + 1;
-    const newMood = new Mood({ userId, day: new Date().toLocaleDateString(), mood: moodScore });
+    // Save mood data
+    const newMood = new Mood({ userId, day: new Date().toLocaleDateString(), mood: analysis.moodPercentage });
     await newMood.save();
 
-    // Simulate productivity analysis
-    const productiveScore = Math.floor(Math.random() * 100) + 1;
+    // Update productivity data
+    // For simplicity, we'll use the mood percentage as a proxy for productivity
+    const productiveScore = analysis.moodPercentage;
     const procrastinationScore = 100 - productiveScore;
     await Productivity.updateOne({ userId, name: "Productive" }, { value: productiveScore }, { upsert: true });
     await Productivity.updateOne({ userId, name: "Procrastination" }, { value: procrastinationScore }, { upsert: true });
 
-    // Simulate activity suggestion
-    const activityTypes = ["outdoor", "relaxation", "entertainment"];
-    const randomType = activityTypes[Math.floor(Math.random() * activityTypes.length)];
+    // Save activity suggestion
     const newActivity = new Activity({ 
       userId, 
-      name: `Suggested activity based on your journal`, 
-      type: randomType 
+      name: analysis.activitySuggestion,
+      type: "ai-suggested"
     });
     await newActivity.save();
-
-    // Simulate goal generation
-    if (Math.random() > 0.7) {  // 30% chance of generating a new goal
-      const goalTypes = ["health", "productivity", "personal"];
-      const randomGoalType = goalTypes[Math.floor(Math.random() * goalTypes.length)];
-      const newGoal = new Goal({
-        userId,
-        name: `New ${randomGoalType} goal based on your journal`,
-        progress: 0
-      });
-      await newGoal.save();
-    }
-
-    // Simulate milestone achievement
-    if (Math.random() > 0.8) {  // 20% chance of achieving a milestone
-      const newMilestone = new Milestone({
-        userId,
-        description: "You've achieved a new milestone based on your journal entry!"
-      });
-      await newMilestone.save();
-    }
 
     // Save the journal entry
     const newJournalEntry = new JournalEntry({
       userId,
       content,
-      mood: moodScore,
-      sentiment: Math.random() * 2 - 1, // Random sentiment score between -1 and 1
-      moodTrigger: ["work", "family", "exercise", "sleep", "food"][Math.floor(Math.random() * 5)],
-      happyMoment: ["spending time outdoors", "meeting friends", "accomplishing a task", "learning something new"][Math.floor(Math.random() * 4)],
-      gratitude: ["health", "family", "friends", "career", "personal growth"][Math.floor(Math.random() * 5)]
+      mood: analysis.moodPercentage,
+      overallMood: analysis.overallMood,
+      activitySuggestion: analysis.activitySuggestion,
+      stressReason: analysis.stressReason
     });
     await newJournalEntry.save();
 
     res.status(201).json({
       message: "Journal entry processed successfully",
-      journalEntry: newJournalEntry
+      journalEntry: newJournalEntry,
+      analysis
     });
   } catch (error) {
     console.error(error);
