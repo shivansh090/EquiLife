@@ -2,14 +2,16 @@ import React, { useState } from 'react'
 import { Button } from './ui/button'
 import { Link } from 'react-router-dom'
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
-import { Menu } from 'lucide-react'
+import { Menu, Brain } from 'lucide-react'
 
 export const Navbar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   const navItems = [
+    { to: "/", label: "Home" },
+    { to: "/dashboard", label: "Dashboard" },
     { to: "/diary", label: "Add Journal" },
-    { to: "/analytics", label: "Analytics" },
+    // { to: "/analytics", label: "Analytics" },
     { to: "/self-care", label: "Resources" },
     { to: "/profile", label: "Profile" },
   ]
@@ -33,10 +35,12 @@ export const Navbar = () => {
   return (
     <header className="flex px-4 sm:px-10 py-2 justify-between items-center mb-6">
       <Link to='/'>
-        <h1 className="sm:text-2xl text-lg  font-bold transition-colors duration-300 ease-in-out hover:text-primary">
-          Mental Health Tracker
-        </h1>
+          <div className="flex items-center gap-2">
+            <Brain className="h-6 w-6 text-primary" />
+            <span className="text-xl font-bold">EquiLife</span>
+          </div>
       </Link>
+      
       
       {/* Desktop Navigation */}
       <nav className="hidden md:flex space-x-2">

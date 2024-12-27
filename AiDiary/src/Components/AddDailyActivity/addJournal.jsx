@@ -18,7 +18,8 @@ export default function MoodJournal() {
   const [gratitude, setGratitude] = useState(null)
   const [activityLog, setActivityLog] = useState([])
   const [moodTrend, setMoodTrend] = useState([])
-
+  const userId = localStorage.getItem("user");
+  const token = localStorage.getItem("authToken");
   useEffect(() => {
     fetchJournalEntries();
     fetchMoodTrend();
@@ -26,7 +27,14 @@ export default function MoodJournal() {
 
   const fetchJournalEntries = async () => {
     try {
-      const response = await fetch('http://localhost:3000/journal/652f1f9b9e87a2a9f22d60b9');
+      const response = await fetch(`http://localhost:3000/journal`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`, // Send the JWT token in the Authorization header
+          },
+    });
       if (!response.ok) {
         throw new Error('Failed to fetch journal entries');
       }
@@ -39,7 +47,14 @@ export default function MoodJournal() {
 
   const fetchMoodTrend = async () => {
     try {
-      const response = await fetch('http://localhost:3000/mood-trend/652f1f9b9e87a2a9f22d60b9');
+      const response = await fetch(`http://localhost:3000/mood-trend`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`, // Send the JWT token in the Authorization header
+          },
+    });
       if (!response.ok) {
         throw new Error('Failed to fetch mood trend');
       }
@@ -57,39 +72,62 @@ export default function MoodJournal() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            "Authorization": `Bearer ${token}`, 
           },
           body: JSON.stringify({
-            userId: '652f1f9b9e87a2a9f22d60b9',
+            userId,
             content: journalEntry
           }),
         });
-
+  
         if (!response.ok) {
           throw new Error('Failed to submit journal entry');
         }
-
+  
         const data = await response.json();
-        const { journalEntry: newEntry } = data;
-
-        setMoodAnalysis(newEntry.mood > 50 ? 'Positive' : 'Negative');
+        const { journalEntry: newEntry, analysis } = data;
+  
+        setMoodAnalysis(analysis.overallMood);
         setSentimentAnalysis({
-          sentiment: newEntry.sentiment > 0 ? 'Positive' : 'Negative',
-          score: newEntry.sentiment
+          sentiment: analysis.moodPercentage > 50 ? 'Positive' : 'Negative',
+          score: (analysis.moodPercentage / 50) - 1
         });
-        setMoodTrigger(newEntry.moodTrigger);
-        setHappyMoment(newEntry.happyMoment);
-        setGratitude(newEntry.gratitude);
-
+        setMoodTrigger(analysis.stressReason || null);
+  
+        // Display goal updates and milestones
+        const updateMessages = [];
+  
+        if (analysis.goalUpdates && analysis.goalUpdates.length > 0) {
+          analysis.goalUpdates.forEach(update => {
+            if (update.isNewGoal) {
+              updateMessages.push(`New goal created: ${update.name}`);
+            } else if (update.achieved) {
+              updateMessages.push(`Goal achieved: ${update.name}`);
+            } else if (update.progressUpdate !== null) {
+              updateMessages.push(`Goal progress updated: ${update.name} (${update.progressUpdate}%)`);
+            }
+          });
+        }
+  
+        if (analysis.milestones && analysis.milestones.length > 0) {
+          analysis.milestones.forEach(milestone => {
+            updateMessages.push(`New milestone: ${milestone}`);
+          });
+        }
+        
+        // You might want to create a new state variable for updates and set it here
+        setUpdates(updateMessages);
+  
         setActivityLog(prevLog => [newEntry, ...prevLog]);
         
         // Update mood trend
         setMoodTrend(prevTrend => {
-          const newTrend = [...prevTrend.slice(1), { day: 'Today', score: newEntry.sentiment }];
+          const newTrend = [...prevTrend.slice(1), { day: 'Today', score: (analysis.moodPercentage / 50) - 1 }];
           return newTrend;
         });
-
+  
         setJournalEntry('');
-
+  
         // Refresh journal entries and mood trend
         fetchJournalEntries();
         fetchMoodTrend();
