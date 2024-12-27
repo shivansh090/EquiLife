@@ -102,6 +102,7 @@ const cors = require('cors');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 // Connect to MongoDB
 mongoose.connect('mongodb://localhost:27017/todoApptest', {
@@ -131,13 +132,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Initialize Google Generative AI
 
-const genAI = new GoogleGenerativeAI("YOUR_GEMINI_API_KEY");
+const genAI = new GoogleGenerativeAI(process.env.YOUR_GEMINI_API_KEY);
+console.log(process.env.YOUR_GEMINI_API_KEY);
 
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 // JWT Secret
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
-
+const JWT_SECRET = process.env.JWT_SECRET ;
+console.log(JWT_SECRET)
 // Authentication Middleware
 const authMiddleware = (req, res, next) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
