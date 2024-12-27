@@ -1,7 +1,7 @@
 import React from 'react';
 import { X as CircleX } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
 
 function EditModal({ isOpen, onClose, title, onSave, inputType = "text" }) {
   const [value, setValue] = React.useState('');

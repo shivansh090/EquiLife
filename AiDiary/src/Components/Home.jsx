@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'; // Use react-router-dom Link
-import { Button } from '@/components/ui/button'; // Adjust the imports if necessary
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'; // Adjust the imports if necessary
+import { Button } from '@/Components/ui/button'; // Adjust the imports if necessary
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card'; // Adjust the imports if necessary
 import { Line, LineChart, Bar, BarChart, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts'; // You can use recharts as is
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'; // Adjust imports if necessary
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/Components/ui/chart'; // Adjust imports if necessary
 import { Brain, TrendingUp, Heart, Sparkles, BarChart3, Activity } from 'lucide-react'; // You can use lucide-react icons
 import { activityImpact, moodHistory, moodValues } from './MoodAnalytics/analytics';
 
