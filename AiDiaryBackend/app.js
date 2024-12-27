@@ -130,7 +130,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Initialize Google Generative AI
+
 const genAI = new GoogleGenerativeAI("YOUR_GEMINI_API_KEY");
+
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 // JWT Secret
