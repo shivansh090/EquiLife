@@ -3,6 +3,12 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-positive: #2a9d90; 
+  --color-negative: #FF8042;
+  --color-progress: #0088FE;
+}
+
 .no-scrollbar{
   scrollbar-width: none;
 }

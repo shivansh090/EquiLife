@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Line, LineChart, Bar, BarChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 
 // Hardcoded data (replace with actual data in a real application)
-const moodHistory = [
+export const moodHistory = [
   { day: "Monday", mood: "Happy", sleep: 7, exercise: 30, work: 8, leisure: 3 },
   { day: "Tuesday", mood: "Sad", sleep: 6, exercise: 0, work: 9, leisure: 2 },
   { day: "Wednesday", mood: "Neutral", sleep: 8, exercise: 45, work: 7, leisure: 4 },
@@ -19,7 +19,7 @@ const moodHistory = [
   { day: "Sunday", mood: "Relaxed", sleep: 8, exercise: 60, work: 0, leisure: 10 },
 ]
 
-const moodValues = {
+export const moodValues = {
   "Happy": 5,
   "Relaxed": 4,
   "Neutral": 3,
@@ -27,11 +27,12 @@ const moodValues = {
   "Sad": 1,
 }
 
-const activityImpact = [
+export const activityImpact = [
   { name: 'Exercise', impact: 0.8 },
   { name: 'Work', impact: -0.3 },
-  { name: 'Leisure', impact: 0.6 },
-  { name: 'Sleep', impact: 0.5 },
+  { name: 'Gaming', impact: 0.4 },
+  { name: 'Sleep', impact: 0.6 },
+  { name: 'Leisure', impact: -0.2 },
 ]
 
 const stressReasons = [

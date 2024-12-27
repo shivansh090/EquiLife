@@ -74,7 +74,7 @@ export default function SignupPage() {
         <div className="text-center mb-8">
           <a href="/" className="inline-flex items-center gap-2">
             <Brain className="h-6 w-6 text-primary" />
-            <span className="text-2xl font-bold">MindTracker</span>
+            <span className="text-2xl font-bold">EquiLife</span>
           </a>
         </div>
 

@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom'; // Use react-router-dom Link
 import { Button } from '@/components/ui/button'; // Adjust the imports if necessary
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'; // Adjust the imports if necessary
-import { Line, LineChart, Bar, BarChart, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'; // You can use recharts as is
+import { Line, LineChart, Bar, BarChart, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts'; // You can use recharts as is
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'; // Adjust imports if necessary
 import { Brain, TrendingUp, Heart, Sparkles, BarChart3, Activity } from 'lucide-react'; // You can use lucide-react icons
+import { activityImpact, moodHistory, moodValues } from './MoodAnalytics/analytics';
 
 // Example data for charts
 const demoMoodData = [
@@ -26,13 +27,13 @@ const demoProgressData = [
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
+    <div className="min-h-screen mx-auto bg-gradient-to-b from-background to-background/80">
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex items-center justify-between p-4">
           <div className="flex items-center gap-2">
             <Brain className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">MindTracker</span>
+            <span className="text-xl font-bold">EquiLife</span>
           </div>
           <div className="flex items-center gap-4">
             
@@ -118,7 +119,7 @@ export default function HomePage() {
             Powerful Analytics at Your Fingertips
           </h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle>Mood Distribution</CardTitle>
                 <CardDescription>Track positive and negative emotions over time</CardDescription>
@@ -141,14 +142,14 @@ export default function HomePage() {
                       <XAxis dataKey="month" />
                       <YAxis />
                       <ChartTooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="positive" fill="var(--color-positive)" />
-                      <Bar dataKey="negative" fill="var(--color-negative)" />
+                      <Bar dataKey="positive" fill="#008c21" />
+                      <Bar dataKey="negative" fill="#cf4500" />
                     </BarChart>
                   </ResponsiveContainer>
                 </ChartContainer>
               </CardContent>
-            </Card>
-            <Card>
+            </Card> */}
+            {/* <Card>
               <CardHeader>
                 <CardTitle>Progress Trends</CardTitle>
                 <CardDescription>Monitor your improvement journey</CardDescription>
@@ -170,14 +171,51 @@ export default function HomePage() {
                       <Line
                         type="monotone"
                         dataKey="progress"
-                        stroke="var(--color-progress)"
+                        stroke="#8884d8"
                         strokeWidth={2}
                       />
                     </LineChart>
                   </ResponsiveContainer>
                 </ChartContainer>
               </CardContent>
-            </Card>
+            </Card> */}
+            <Card>
+          <CardHeader>
+            <CardTitle>Activity Impact on Mood</CardTitle>
+            <CardDescription>How different activities affect your mood</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart data={activityImpact}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <CartesianGrid strokeDasharray="3 3" />
+                <Tooltip />
+                <Bar dataKey="impact" fill="#2a9d90" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+            <Card>
+          <CardHeader>
+            <CardTitle>Sleep Patterns & Mood Impact</CardTitle>
+            <CardDescription>How sleep affects your mood</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={400}>
+              <LineChart data={moodHistory}>
+                <XAxis dataKey="day" />
+                <YAxis yAxisId="left" />
+                <YAxis yAxisId="right" orientation="right" domain={[0, 5]} tickFormatter={(value) => Object.keys(moodValues).find(key => moodValues[key] === value) || ''} />
+                <CartesianGrid strokeDasharray="3 3" />
+                <Tooltip />
+                <Legend />
+                <Line yAxisId="left" type="monotone" dataKey="sleep" stroke="#8884d8" strokeWidth={2} name="Sleep Hours" />
+                <Line yAxisId="right" type="monotone" dataKey="mood" stroke="#2a9d90" strokeWidth={2} name="Mood" />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
           </div>
         </div>
       </section>
@@ -204,7 +242,7 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center gap-2 mb-4 md:mb-0">
               <Brain className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold">MindTracker</span>
+              <span className="text-xl font-bold">EquiLife</span>
             </div>
             <div className="flex gap-8">
               <Link to="/privacy" className="text-sm text-muted-foreground hover:text-primary">
@@ -219,7 +257,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="mt-8 text-center text-sm text-muted-foreground">
-            © {new Date().getFullYear()} MindTracker. All rights reserved.
+            © {new Date().getFullYear()} EquiLife. All rights reserved.
           </div>
         </div>
       </footer>
