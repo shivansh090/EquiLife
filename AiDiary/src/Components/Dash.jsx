@@ -20,12 +20,20 @@ export default function Dashboard() {
   const [error, setError] = useState(null);
 
   const COLORS = ["#0088FE", "#FF8042"];
-
+  const userId = localStorage.getItem("user");
+  const token = localStorage.getItem("authToken");
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await fetch("http://localhost:3000/dashboard/652f1f9b9e87a2a9f22d60b9");
+        const response = await fetch(`http://localhost:3000/dashboard`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`, // Send the JWT token in the Authorization header
+            },
+      });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -40,7 +48,7 @@ export default function Dashboard() {
         
         // Set the current mood and mood score based on the latest mood entry
         if (data.moods.length > 0) {
-          const latestMood = data.moods[data.moods.length - 1];
+          const latestMood = data.moods[0];
           setCurrentMood(`Feeling ${getMoodDescription(latestMood.mood)}`);
           setMoodScore(latestMood.mood);
         }
@@ -112,7 +120,7 @@ export default function Dashboard() {
               {activities.map((activity, index) => (
                 <li key={index} className="flex items-center">
                   {getActivityIcon(activity)}
-                  <span className="ml-2">{activity.name}</span>
+                  <span className="ml-2 w-full">{activity.name}</span>
                 </li>
               ))}
             </ul>
@@ -126,7 +134,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={moodData} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
+              <LineChart data={moodData.reverse()} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
                 <XAxis dataKey="day" tick={{ fontSize: 12 }} />
                 <YAxis dataKey="mood" tick={{ fontSize: 12 }} />
                 <Tooltip />

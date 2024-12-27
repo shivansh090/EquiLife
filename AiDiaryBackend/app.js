@@ -95,14 +95,16 @@
 //   }
 // });
 
-
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/todoApp', {
+mongoose.connect('mongodb://localhost:27017/todoApptest', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -127,12 +129,157 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Routes
+// Initialize Google Generative AI
+const genAI = new GoogleGenerativeAI("AIzaSyDFg4ixtUYzPA4DyC3E1DfvCenK0DaR3Cw");
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+// JWT Secret
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
+
+// Authentication Middleware
+const authMiddleware = (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
+
+  if (!token) {
+    return res.status(401).json({ error: 'No token, authorization denied' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded.user;
+    next();
+  } catch (err) {
+    res.status(401).json({ error: 'Token is not valid' });
+  }
+};
+
+// Helper function to analyze journal entry using AI
+async function analyzeJournalEntry(content, goals) {
+  const prompt = `Journal Entry:
+
+${content}
+
+Current Goals:
+${goals.map(goal => `- ${goal.name} (Current progress: ${goal.progress}%)`).join('\n')}
+
+Based on this journal entry and the current goals, please provide the following:
+1. Mood percentage (0-100, where 0 is very bad and 100 is very happy)
+2. Overall mood of the day (e.g., happy, sad, angry, etc.)
+3. An activity suggestion
+4. A reason for stress (if any)
+5. Goal achievements, progress updates, or new goals mentioned (if any)
+6. Any significant milestones or achievements mentioned in the journal entry (independent of goals)
+
+Return the result in an object with the following key-value pairs:
+- moodPercentage: number
+- overallMood: string
+- activitySuggestion: string
+- stressReason: string (keep this empty if there isn't any stress mentioned)
+- goalUpdates: array of objects, each containing:
+  - name: string (name of the goal)
+  - progressUpdate: number (new progress percentage, or null if no update)
+  - achieved: boolean (true if the goal was fully achieved, false otherwise)
+  - isNewGoal: boolean (true if this is a newly mentioned goal, false for existing goals)
+- milestones: array of strings, each describing a significant milestone or achievement mentioned in the journal entry
+
+Don't return any other prompt, just return the object.`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    let responseText = result.response?.text();
+
+    // Clean the response text to extract valid JSON
+    responseText = responseText.trim();
+    responseText = responseText.replace(/```json/g, "").replace(/```/g, "");
+
+    // Parse the cleaned response text as JSON
+    return JSON.parse(responseText);
+  } catch (error) {
+    console.error("Error analyzing journal entry:", error);
+    throw error;
+  }
+}
+
+// Authentication Routes
+
+// Signup
+app.post('/api/signup', async (req, res) => {
+  const { username, email, password } = req.body;
+
+  try {
+    let user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({ error: 'User already exists' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    user = new User({
+      username,
+      email,
+      password: hashedPassword
+    });
+
+    await user.save();
+
+    const payload = {
+      user: {
+        id: user.id
+      }
+    };
+
+    jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
+      if (err) throw err;
+      res.json({ token });
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// Login
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    let user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid Credentials' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Invalid Credentials' });
+    }
+
+    const payload = {
+      user: {
+        id: user.id
+      }
+    };
+
+    jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
+      if (err) throw err;
+      res.json({ token, payload });
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// Logout (Note: JWT is stateless, so we'll just return a success message)
+app.post('/api/logout', (req, res) => {
+  res.json({ message: 'Logged out successfully' });
+});
+
+// Protected Routes (use authMiddleware)
 
 // Get Dashboard Data
-app.get("/dashboard/:userId", async (req, res) => {
-  const { userId } = req.params;
-
+app.get("/dashboard", authMiddleware, async (req, res) => {
+  const userId = req.user.id;
   try {
     const moods = await Mood.find({ userId }).sort({ createdAt: -1 }).limit(7);
     const productivity = await Productivity.find({ userId });
@@ -154,51 +301,74 @@ app.get("/dashboard/:userId", async (req, res) => {
 });
 
 // Add New Journal Entry
-app.post("/journal", async (req, res) => {
-  const { userId, content } = req.body;
+app.post("/journal", authMiddleware, async (req, res) => {
+  const userId = req.user.id;
+  const { content } = req.body;
 
   try {
-    // In a real-world scenario, you would process the journal entry with an AI model here
-    // For now, we'll simulate the AI processing by adding random data
+    // Fetch current goals for the user
+    const currentGoals = await Goal.find({ userId });
 
-    // Simulate mood analysis
-    const moodScore = Math.floor(Math.random() * 100) + 1;
-    const newMood = new Mood({ userId, day: new Date().toLocaleDateString(), mood: moodScore });
+    // Analyze the journal entry using AI
+    const analysis = await analyzeJournalEntry(content, currentGoals);
+    // Save mood data
+    const newMood = new Mood({ userId, day: new Date().toLocaleDateString(), mood: analysis.moodPercentage });
     await newMood.save();
 
-    // Simulate productivity analysis
-    const productiveScore = Math.floor(Math.random() * 100) + 1;
+    // Update productivity data
+    const productiveScore = analysis.moodPercentage;
     const procrastinationScore = 100 - productiveScore;
     await Productivity.updateOne({ userId, name: "Productive" }, { value: productiveScore }, { upsert: true });
     await Productivity.updateOne({ userId, name: "Procrastination" }, { value: procrastinationScore }, { upsert: true });
 
-    // Simulate activity suggestion
-    const activityTypes = ["outdoor", "relaxation", "entertainment"];
-    const randomType = activityTypes[Math.floor(Math.random() * activityTypes.length)];
+    // Save activity suggestion
     const newActivity = new Activity({ 
       userId, 
-      name: `Suggested activity based on your journal`, 
-      type: randomType 
+      name: analysis.activitySuggestion,
+      type: "ai-suggested"
     });
     await newActivity.save();
 
-    // Simulate goal generation
-    if (Math.random() > 0.7) {  // 30% chance of generating a new goal
-      const goalTypes = ["health", "productivity", "personal"];
-      const randomGoalType = goalTypes[Math.floor(Math.random() * goalTypes.length)];
-      const newGoal = new Goal({
-        userId,
-        name: `New ${randomGoalType} goal based on your journal`,
-        progress: 0
-      });
-      await newGoal.save();
+    // Update or create goals based on AI analysis
+    for (const goalUpdate of analysis.goalUpdates) {
+      if (goalUpdate.isNewGoal) {
+        // Create a new goal
+        const newGoal = new Goal({
+          userId,
+          name: goalUpdate.name,
+          progress: goalUpdate.progressUpdate || 0,
+          achieved: goalUpdate.achieved || false
+        });
+        await newGoal.save();
+      } else {
+        // Update existing goal
+        const updatedGoal = await Goal.findOneAndUpdate(
+          { userId, name: goalUpdate.name },
+          { 
+            $set: { 
+              progress: goalUpdate.progressUpdate !== null ? goalUpdate.progressUpdate : 100,
+              achieved: goalUpdate.achieved
+            }
+          },
+          { new: true }
+        );
+
+        if (updatedGoal && goalUpdate.achieved) {
+          // Create a new milestone for achieved goal
+          const newMilestone = new Milestone({
+            userId,
+            description: `Achieved goal: ${updatedGoal.name}`
+          });
+          await newMilestone.save();
+        }
+      }
     }
 
-    // Simulate milestone achievement
-    if (Math.random() > 0.8) {  // 20% chance of achieving a milestone
+    // Save milestones detected by AI
+    for (const milestoneDescription of analysis.milestones) {
       const newMilestone = new Milestone({
         userId,
-        description: "You've achieved a new milestone based on your journal entry!"
+        description: milestoneDescription
       });
       await newMilestone.save();
     }
@@ -207,17 +377,17 @@ app.post("/journal", async (req, res) => {
     const newJournalEntry = new JournalEntry({
       userId,
       content,
-      mood: moodScore,
-      sentiment: Math.random() * 2 - 1, // Random sentiment score between -1 and 1
-      moodTrigger: ["work", "family", "exercise", "sleep", "food"][Math.floor(Math.random() * 5)],
-      happyMoment: ["spending time outdoors", "meeting friends", "accomplishing a task", "learning something new"][Math.floor(Math.random() * 4)],
-      gratitude: ["health", "family", "friends", "career", "personal growth"][Math.floor(Math.random() * 5)]
+      mood: analysis.moodPercentage,
+      overallMood: analysis.overallMood,
+      activitySuggestion: analysis.activitySuggestion,
+      stressReason: analysis.stressReason
     });
     await newJournalEntry.save();
 
     res.status(201).json({
       message: "Journal entry processed successfully",
-      journalEntry: newJournalEntry
+      journalEntry: newJournalEntry,
+      analysis
     });
   } catch (error) {
     console.error(error);
@@ -226,8 +396,8 @@ app.post("/journal", async (req, res) => {
 });
 
 // Get Journal Entries
-app.get("/journal/:userId", async (req, res) => {
-  const { userId } = req.params;
+app.get("/journal", authMiddleware, async (req, res) => {
+  const userId = req.user.id;
 
   try {
     const journalEntries = await JournalEntry.find({ userId }).sort({ createdAt: -1 }).limit(10);
@@ -239,8 +409,8 @@ app.get("/journal/:userId", async (req, res) => {
 });
 
 // Get Mood Trend
-app.get("/mood-trend/:userId", async (req, res) => {
-  const { userId } = req.params;
+app.get("/mood-trend", authMiddleware, async (req, res) => {
+  const userId = req.user.id;
 
   try {
     const moodTrend = await Mood.find({ userId }).sort({ createdAt: -1 }).limit(7);

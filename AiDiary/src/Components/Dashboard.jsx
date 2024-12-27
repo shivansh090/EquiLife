@@ -33,7 +33,7 @@ export default function Dashboard() {
     { name: "Procrastination", value: 35 },
   ]
   const COLORS = ["#0088FE", "#FF8042"]
-console.log(productivityData)
+// console.log(productivityData)
   const goals = [
     { name: "Exercise 3x/week", progress: 66 },
     { name: "Read 20 pages/day", progress: 80 },

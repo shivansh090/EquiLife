@@ -1,10 +1,10 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const goalSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  name: { type: String, required: true },
-  progress: { type: Number, required: true }, // Progress percentage
+const GoalSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  name: String,
+  progress: Number,
+  achieved: { type: Boolean, default: false }
 }, { timestamps: true });
 
-const Goal = mongoose.model("Goal", goalSchema);
-module.exports = Goal;
+module.exports = mongoose.model('Goal', GoalSchema);
