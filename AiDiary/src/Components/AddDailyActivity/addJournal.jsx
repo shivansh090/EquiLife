@@ -27,7 +27,7 @@ export default function MoodJournal() {
 
   const fetchJournalEntries = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/journal`,
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/journal`,
         {
           method: "GET",
           headers: {
@@ -47,7 +47,7 @@ export default function MoodJournal() {
 
   const fetchMoodTrend = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/mood-trend`,
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/mood-trend`,
         {
           method: "GET",
           headers: {
@@ -68,7 +68,7 @@ export default function MoodJournal() {
   const handleSubmit = async () => {
     if (journalEntry.trim()) {
       try {
-        const response = await fetch('http://localhost:3000/journal', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/journal`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
