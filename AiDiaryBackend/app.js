@@ -277,7 +277,11 @@ app.post('/api/logout', (req, res) => {
 });
 
 // Protected Routes (use authMiddleware)
-
+app.get("/apitest",(req,res)=>{
+  res.send(
+    '<h1>Hey There</h1>'
+  )
+})
 // Get Dashboard Data
 app.get("/dashboard", authMiddleware, async (req, res) => {
   const userId = req.user.id;
