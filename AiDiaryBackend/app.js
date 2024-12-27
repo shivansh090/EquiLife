@@ -105,11 +105,11 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/todoApptest', {
+mongoose.connect(process.env.DB_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-  .then(() => console.log('Connected to MongoDB...'))
+  .then(() => console.log('Connected to MongoDB'))
   .catch((error) => console.error('Could not connect to MongoDB...', error));
 
 // Import Models
@@ -133,13 +133,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Initialize Google Generative AI
 
 const genAI = new GoogleGenerativeAI(process.env.YOUR_GEMINI_API_KEY);
-console.log(process.env.YOUR_GEMINI_API_KEY);
 
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 // JWT Secret
 const JWT_SECRET = process.env.JWT_SECRET ;
-console.log(JWT_SECRET)
 // Authentication Middleware
 const authMiddleware = (req, res, next) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
@@ -195,7 +193,6 @@ Don't return any other prompt, just return the object.`;
     // Clean the response text to extract valid JSON
     responseText = responseText.trim();
     responseText = responseText.replace(/```json/g, "").replace(/```/g, "");
-
     // Parse the cleaned response text as JSON
     return JSON.parse(responseText);
   } catch (error) {
