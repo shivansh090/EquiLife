@@ -72,7 +72,7 @@ export default function LoginPage() {
             <CardContent className="space-y-4">
               {/* Error Alert */}
               {error && (
-                <Alert variant="destructive">
+                <Alert className="border-red-600 border-2 text-red-900" variant="destructive">
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}

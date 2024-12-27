@@ -229,7 +229,7 @@ app.post('/api/signup', async (req, res) => {
       }
     };
 
-    jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
+    jwt.sign(payload, JWT_SECRET, { expiresIn: '48h' }, (err, token) => {
       if (err) throw err;
       res.json({ token });
     });

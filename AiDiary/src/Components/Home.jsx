@@ -35,11 +35,11 @@ export default function HomePage() {
             <span className="text-xl font-bold">MindTracker</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link to="/about" className="text-sm hover:text-primary">About Us</Link>
-            <Link to="/features" className="text-sm hover:text-primary">Features</Link>
-            <Link to="/blog" className="text-sm hover:text-primary">Blog</Link>
+            
+            <Link to="/" className="text-md hidden sm:block hover:text-primary">About Us</Link>
+            <Link to="/dashboard" className="text-md hover:text-primary">Dashboard</Link>
             <Link to="/login">
-              <Button>Login</Button>
+              <Button className="text-md font-bold">Login</Button>
             </Link>
           </div>
         </div>
