@@ -25,7 +25,7 @@ export default function Dashboard() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:3000/dashboard`,
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/dashboard`,
           {
             method: "GET",
             headers: {
