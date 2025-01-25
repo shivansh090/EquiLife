@@ -60,15 +60,15 @@ export default function HomePage() {
             </p>
             <div className="flex justify-center gap-4">
               <Link to="/signup">
-                <Button size="lg" className="bg-primary hover:bg-primary/90">
+                <Button size="lg" variant="outline" className="border-gray-600"/*className="bg-primary hover:bg-primary/90"*/ >
                   Get Started Free
                 </Button>
               </Link>
-              <Link to="/demo">
+              {/* <Link to="/demo">
                 <Button size="lg" variant="outline">
                   View Demo
                 </Button>
-              </Link>
+              </Link> */}
             </div>
           </div>
         </div>
