@@ -50,40 +50,43 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gradient-to-br from-[#f3e8ff] via-[#e0f7fa] to-[#f3e8ff] py-8">
       <div className="container mx-auto p-4 sm:p-8 max-w-6xl">
         <main className="grid gap-8 md:grid-cols-2">
-          <Card className="bg-glass card">
+          {/* Current Mood - dark card */}
+          <Card className="card-dark">
             <CardHeader>
-              <CardTitle className="text-xl text-primary">Current Mood</CardTitle>
+              <CardTitle className="text-xl text-orange-400">Current Mood</CardTitle>
               <CardDescription className="text-lg">{currentMood}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
-                <Frown className="text-red-400" />
+                <Frown className="text-orange-400" />
                 <Progress value={moodScore} className="w-2/3" />
                 <Smile className="text-green-400" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-glass card">
+          {/* Activity Suggestions - orange card */}
+          <Card className="card-light border-l-8 border-orange-400">
             <CardHeader>
-              <CardTitle className="text-xl text-primary">Activity Suggestions</CardTitle>
+              <CardTitle className="text-xl text-orange-500">Activity Suggestions</CardTitle>
               <CardDescription>Try these self-care activities</CardDescription>
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
                 {activities.map((activity, index) => (
                   <li key={index} className="flex items-center">
-                    {activity.icon}
-                    <span className="ml-2">{activity.name}</span>
+                    <span className="badge-orange px-2 py-1 rounded mr-2">{activity.icon}</span>
+                    <span>{activity.name}</span>
                   </li>
                 ))}
               </ul>
             </CardContent>
           </Card>
 
-          <Card className="bg-glass card col-span-full md:col-span-1">
+          {/* Mood Analysis - white card with orange border */}
+          <Card className="card-light border-l-8 border-orange-400">
             <CardHeader>
-              <CardTitle className="text-xl text-primary">Mood Analysis</CardTitle>
+              <CardTitle className="text-xl text-orange-500">Mood Analysis</CardTitle>
               <CardDescription>Your mood patterns over the past week</CardDescription>
             </CardHeader>
             <CardContent className="h-[300px]">
@@ -98,9 +101,10 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-glass card col-span-full md:col-span-1">
+          {/* Productivity Patterns - dark card */}
+          <Card className="card-dark">
             <CardHeader>
-              <CardTitle className="text-xl text-primary">Productivity Patterns</CardTitle>
+              <CardTitle className="text-xl text-orange-400">Productivity Patterns</CardTitle>
               <CardDescription>Your productivity overview</CardDescription>
             </CardHeader>
             <CardContent className="h-[300px]">
@@ -126,9 +130,10 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-glass card">
+          {/* Goal Achievement - orange card */}
+          <Card className="card-light border-l-8 border-orange-400">
             <CardHeader>
-              <CardTitle className="text-xl text-primary">Goal Achievement</CardTitle>
+              <CardTitle className="text-xl text-orange-500">Goal Achievement</CardTitle>
               <CardDescription>Track your progress</CardDescription>
             </CardHeader>
             <CardContent>
@@ -146,9 +151,10 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-glass card">
+          {/* Milestones - dark card */}
+          <Card className="card-dark">
             <CardHeader>
-              <CardTitle className="text-xl text-primary">Milestones & Accomplishments</CardTitle>
+              <CardTitle className="text-xl text-orange-400">Milestones & Accomplishments</CardTitle>
               <CardDescription>Your recent achievements</CardDescription>
             </CardHeader>
             <CardContent>

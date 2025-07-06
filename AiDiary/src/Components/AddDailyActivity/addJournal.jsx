@@ -8,6 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert"
 import { ScrollArea } from "@/Components/ui/scroll-area"
 import { Line, LineChart, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/Components/ui/chart"
+import bg from '@/assets/images/bg.png';
 
 export default function MoodJournal() {
   const [journalEntry, setJournalEntry] = useState('')
@@ -138,116 +139,148 @@ export default function MoodJournal() {
   }
 
   return (
-    <div className="container mx-auto p-4 max-w-3xl">
-      <h1 className="text-2xl font-bold mb-4">Mood Journal</h1>
-      
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>How are you feeling today?</CardTitle>
-          <CardDescription>Write about your day, thoughts, or feelings.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Textarea
-            placeholder="Start writing here..."
-            value={journalEntry}
-            onChange={(e) => setJournalEntry(e.target.value)}
-            className="min-h-[150px]"
-          />
-        </CardContent>
-        <CardFooter>
-          <Button onClick={handleSubmit}>Submit</Button>
-        </CardFooter>
-      </Card>
-
-      {moodAnalysis && (
-        <Alert className="mb-6">
-          <AlertTitle>Mood Analysis</AlertTitle>
-          <AlertDescription>
-            Based on your entry, your mood seems to be: <strong>{moodAnalysis}</strong>
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {sentimentAnalysis && (
-        <Card className="mb-6">
+    <div
+      className="min-h-screen flex items-center justify-center"
+      style={{
+        backgroundImage: `url(${bg})`,
+        backgroundSize: "130%",
+        backgroundPosition: "center",
+        backgroundRepeat: "repeat",
+      }}
+    >
+      <div className="container mx-auto p-4 max-w-3xl">
+        <h1 className="text-2xl font-bold mb-4">
+          Mood <span className="text-blue-600">Journal</span>
+        </h1>
+        
+        <Card className="mb-6 bg-white/50 backdrop-blur border-blue-200">
           <CardHeader>
-            <CardTitle>Emotion and Sentiment Analysis</CardTitle>
+            <CardTitle>
+              How are you <span className="text-blue-600">feeling</span> today?
+            </CardTitle>
+            <CardDescription className="text-gray-700">
+              Write about your day, thoughts, or feelings.
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <p>Sentiment: <strong>{sentimentAnalysis.sentiment}</strong></p>
-            <p>Score: <strong>{sentimentAnalysis.score.toFixed(2)}</strong> (-1 to 1)</p>
-            <div className="mt-4">
-              <h4 className="text-sm font-semibold mb-2">Your Mood Trend</h4>
-              <ChartContainer
-                config={{
-                  mood: {
-                    label: "Mood",
-                    color: "#2a9d90",
-                  },
-                }}
-                className="h-full"
-              >
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={moodTrend}>
-                    <XAxis dataKey="day" />
-                    <YAxis domain={[-1, 1]} />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Line type="monotone" dataKey="score" stroke="var(--color-mood)" strokeWidth={2} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </ChartContainer>
-            </div>
+            <Textarea
+              placeholder="Start writing here..."
+              value={journalEntry}
+              onChange={(e) => setJournalEntry(e.target.value)}
+              className="min-h-[150px]"
+            />
+          </CardContent>
+          <CardFooter>
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold" onClick={handleSubmit}>Submit</Button>
+          </CardFooter>
+        </Card>
+
+        {moodAnalysis && (
+          <Alert className="mb-6 bg-white/50 border-blue-200">
+            <AlertTitle>
+              Mood <span className="text-blue-600">Analysis</span>
+            </AlertTitle>
+            <AlertDescription className="text-gray-700">
+              Based on your entry, your mood seems to be: <strong className="text-blue-600">{moodAnalysis}</strong>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {sentimentAnalysis && (
+          <Card className="mb-6 bg-white/50 border-blue-200">
+            <CardHeader>
+              <CardTitle>
+                Emotion and <span className="text-blue-600">Sentiment</span> Analysis
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Sentiment: <strong className="text-blue-600">{sentimentAnalysis.sentiment}</strong></p>
+              <p>Score: <strong className="text-blue-600">{sentimentAnalysis.score.toFixed(2)}</strong> (-1 to 1)</p>
+              <div className="mt-4">
+                <h4 className="text-sm font-semibold mb-2">
+                  Your <span className="text-blue-600">Mood Trend</span>
+                </h4>
+                <ChartContainer
+                  config={{
+                    mood: {
+                      label: "Mood",
+                      color: "#2a9d90",
+                    },
+                  }}
+                  className="h-full"
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={moodTrend}>
+                      <XAxis dataKey="day" />
+                      <YAxis domain={[-1, 1]} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Line type="monotone" dataKey="score" stroke="var(--color-mood)" strokeWidth={2} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {moodTrigger && (
+          <Alert className="mb-6 bg-white/50 border-blue-200">
+            <AlertTitle>
+              Mood <span className="text-blue-600">Trigger</span>
+            </AlertTitle>
+            <AlertDescription className="text-gray-700">
+              It seems that <strong className="text-blue-600">{moodTrigger}</strong> might be influencing your mood today.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {happyMoment && (
+          <Alert className="mb-6 bg-white/50 border-blue-200">
+            <AlertTitle>
+              Happy <span className="text-blue-600">Moment</span>
+            </AlertTitle>
+            <AlertDescription className="text-gray-700">
+              It looks like <strong className="text-blue-600">{happyMoment}</strong> brought you joy today. Try to incorporate more of these moments into your routine!
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {gratitude && (
+          <Alert className="mb-6 bg-white/50 border-blue-200">
+            <AlertTitle>
+              Reflection and <span className="text-blue-600">Gratitude</span>
+            </AlertTitle>
+            <AlertDescription className="text-gray-700">
+              You mentioned being grateful for your <strong className="text-blue-600">{gratitude}</strong>. Reflecting on these positive aspects can improve your overall well-being.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        <Card className="bg-white/50 border-blue-200">
+          <CardHeader>
+            <CardTitle>
+              Activity <span className="text-blue-600">Log</span>
+            </CardTitle>
+            <CardDescription className="text-gray-700">
+              Your recent journal entries and moods
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[300px]">
+              {activityLog.map((activity, index) => (
+                <div key={index} className="mb-4 p-4 border rounded bg-white/60">
+                  <p className="text-sm text-blue-600 mb-2">
+                    {new Date(activity.createdAt).toLocaleString()}
+                  </p>
+                  <p className="mb-2 text-gray-800">{activity.content}</p>
+                  <p className="text-sm font-semibold text-gray-600">Mood: {activity.mood > 50  ? 'Positive' : 'Negative'}</p>
+                  <p className="text-sm font-semibold text-gray-600">Sentiment: {activity.sentiment > 0 ? 'Positive' : 'Negative'}</p>
+                </div>
+              ))}
+            </ScrollArea>
           </CardContent>
         </Card>
-      )}
-
-      {moodTrigger && (
-        <Alert className="mb-6">
-          <AlertTitle>Mood Trigger</AlertTitle>
-          <AlertDescription>
-            It seems that <strong>{moodTrigger}</strong> might be influencing your mood today.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {happyMoment && (
-        <Alert className="mb-6">
-          <AlertTitle>Happy Moment</AlertTitle>
-          <AlertDescription>
-            It looks like <strong>{happyMoment}</strong> brought you joy today. Try to incorporate more of these moments into your routine!
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {gratitude && (
-        <Alert className="mb-6">
-          <AlertTitle>Reflection and Gratitude</AlertTitle>
-          <AlertDescription>
-            You mentioned being grateful for your <strong>{gratitude}</strong>. Reflecting on these positive aspects can improve your overall well-being.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Activity Log</CardTitle>
-          <CardDescription>Your recent journal entries and moods</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[300px]">
-            {activityLog.map((activity, index) => (
-              <div key={index} className="mb-4 p-4 border rounded">
-                <p className="text-sm text-gray-500 mb-2">
-                  {new Date(activity.createdAt).toLocaleString()}
-                </p>
-                <p className="mb-2">{activity.content}</p>
-                <p className="text-sm font-semibold">Mood: {activity.mood > 50  ? 'Positive' : 'Negative'}</p>
-                <p className="text-sm font-semibold">Sentiment: {activity.sentiment > 0 ? 'Positive' : 'Negative'}</p>
-              </div>
-            ))}
-          </ScrollArea>
-        </CardContent>
-      </Card>
+      </div>
     </div>
   )
 }
