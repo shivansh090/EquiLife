@@ -3,7 +3,7 @@ import { Activity, UserCheck, HeartPulse, Sparkles, Info, Brain } from "lucide-r
 import { useNavigate } from "react-router-dom";
 import bg from "../../assets/images/bg.png";
 
-export default function AuthPage() {
+export default function authPage() {
   const [activeTab, setActiveTab] = useState("login");
   const [isExpanded, setIsExpanded] = useState(false);
   const [formData, setFormData] = useState({
