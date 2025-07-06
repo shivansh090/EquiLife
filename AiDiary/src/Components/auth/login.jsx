@@ -52,18 +52,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-background/80 p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f3e8ff] via-[#e0f7fa] to-[#f3e8ff]">
+      <div className="w-full max-w-md bg-glass shadow-xl p-8 rounded-2xl">
         <div className="text-center mb-8">
           <a href="/" className="inline-flex items-center gap-2">
-            <Brain className="h-6 w-6 text-primary" />
-            <span className="text-2xl font-bold">EquiLife</span>
+            <Brain className="h-8 w-8 text-primary" />
+            <span className="text-3xl font-extrabold text-primary">EquiLife</span>
           </a>
         </div>
-
-        <Card>
+        <Card className="card">
           <CardHeader>
-            <CardTitle>Welcome back</CardTitle>
+            <CardTitle className="text-2xl text-primary font-bold">Welcome back</CardTitle>
             <CardDescription>
               Sign in to your account to continue your journey
             </CardDescription>
@@ -76,7 +75,6 @@ export default function LoginPage() {
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
-
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -86,9 +84,9 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  className="bg-white"
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <Input
@@ -98,18 +96,17 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  className="bg-white"
                 />
               </div>
-
               <div className="flex items-center justify-between">
                 <a href="/forgot-password" className="text-sm text-primary hover:underline">
                   Forgot password?
                 </a>
               </div>
             </CardContent>
-
             <CardFooter className="flex flex-col space-y-4">
-              <Button type="submit" variant="outline" className="outline outline-slate-400 " disabled={loading}>
+              <Button type="submit" className="button-primary w-full" disabled={loading}>
                 {loading ? "Logging in..." : "Sign In"}
               </Button>
               <p className="text-sm text-center text-muted-foreground">

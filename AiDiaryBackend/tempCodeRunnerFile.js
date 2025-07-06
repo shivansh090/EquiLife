@@ -35,7 +35,6 @@ for (const goalUpdate of analysis.goalUpdates) {
           const savedGoal = await newGoal.save();
     
           if (savedGoal.achieved) {
-            // Create a new milestone for the achieved goal
             const newMilestone = new Milestone({
               userId,
               description: `Achieved goal: ${savedGoal.name}`

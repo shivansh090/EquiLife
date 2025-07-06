@@ -10,6 +10,7 @@ import MoodJournal from './Components/AddDailyActivity/addJournal'
 import Analytics from './Components/MoodAnalytics/analytics'
 import SelfCareResources from './Components/SelfCare/selfCare'
 import MyProfile from './Components/Profile/Profile'
+import Dashboard from './Components/Dash';
 
 // Custom PrivateRoute component
 function PrivateRoute({ element: Element }) {
@@ -55,7 +56,7 @@ function App() {
         <Route path="/signup" element={<SignupPage />} />
 
         {/* Private Routes */}
-        <Route path="/dashboard" element={<PrivateRoute element={Dash} />} />
+        <Route path="/dashboard" element={<PrivateRoute element={Dashboard} />} />
         <Route path="/diary" element={<PrivateRoute element={MoodJournal} />} />
         <Route path="/analytics" element={<PrivateRoute element={Analytics} />} />
         <Route path="/self-care" element={<PrivateRoute element={SelfCareResources} />} />
