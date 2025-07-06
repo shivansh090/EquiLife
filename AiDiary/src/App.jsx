@@ -10,7 +10,7 @@ import MoodJournal from './Components/AddDailyActivity/addJournal'
 import Analytics from './Components/MoodAnalytics/analytics'
 import SelfCareResources from './Components/SelfCare/selfCare'
 import MyProfile from './Components/Profile/Profile'
-import AuthPage from './Components/auth/AuthPage';
+import AuthPage from './Components/auth/authPage';
 import bg from './assets/images/bg.png'; // adjust path if needed
 
 // Custom PrivateRoute component
