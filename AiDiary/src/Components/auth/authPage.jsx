@@ -91,16 +91,20 @@ export default function authPage() {
       <div className="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-2 mb-4">
         <div className="flex items-center gap-2">
           <Info className="h-5 w-5 text-blue-500" />
-          <span className="font-semibold">For testing, use <b>test@gmail.com</b> / <b>test</b> as email and password.</span>
-          <div className="sm:hidden ml-auto">
-            <button onClick={toggleDescription} className="text-blue-500 text-xs">
+          <span className="font-semibold">For testing, use <i className="text-orange-500">test@gmail.com / test</i> as email and password.</span>
+          <div className="ml-auto">
+            <button
+              onClick={toggleDescription}
+              className="text-orange-500 text-xs font-semibold underline underline-offset-2"
+              style={{ letterSpacing: "0.5px" }}
+            >
               {isExpanded ? "Show Less" : "Show More"}
             </button>
           </div>
         </div>
         {isExpanded && (
-          <p className="sm:hidden text-xs mt-1">
-            This is a demonstration. The backend ML model is not deployed; authentication is for demo only.
+          <p className="text-sm mt-2 text-gray-900 leading-relaxed">
+            I'd love to see your impact! Add some activities or journal entries and leave your mark - let me know someone was here!
           </p>
         )}
       </div>
@@ -110,7 +114,8 @@ export default function authPage() {
         <a href="/" className="inline-flex items-center gap-2">
           <Brain className="h-8 w-8 text-blue-500" />
           <span className="text-2xl font-bold text-gray-900">
-            Equi<span className="text-blue-500">Life</span>
+            <span className="text-blue-500">Equi</span>
+            <span className="text-orange-500">Life</span>
           </span>
         </a>
         <button
