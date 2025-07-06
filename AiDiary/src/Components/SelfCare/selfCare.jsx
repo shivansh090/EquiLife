@@ -10,6 +10,7 @@ import { AlertCircle, PhoneCall, Globe, Timer, Book, Edit3, Apple } from 'lucide
 import { Progress } from "@/Components/ui/progress"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/Components/ui/dialog"
 import { Link } from 'react-router-dom'
+import bg from '@/assets/images/bg.png';
 
 const resources = [
   { activity: "Deep Breathing", description: "Practice deep breathing exercises for 5 minutes.", category: "Relaxation", action: "breathe" },
@@ -135,107 +136,126 @@ function SelfCareResources() {
   }
 
   return (
-    <div className="container mx-auto p-4 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-6">Self-Care Resources</h1>
-      {isTimerRunning && (
-        <Card className="mb-8">
+    <div
+      className="min-h-screen flex items-center justify-center"
+      style={{
+        backgroundImage: `url(${bg})`,
+        backgroundSize: "160%",
+        backgroundPosition: "center",
+        backgroundRepeat: "repeat",
+      }}
+    >
+      <div className="container mx-auto p-4 max-w-4xl">
+        <h1 className="text-3xl font-bold mb-6">
+          Self-<span className="text-blue-600">Care</span> Resources
+        </h1>
+        {isTimerRunning && (
+          <Card className="mb-8 bg-white/70">
+            <CardHeader>
+              <CardTitle className="text-2xl flex items-center relative">
+                <Timer className="mr-2" />
+                Current <span className="text-blue-600 ml-1">Activity</span>: {currentActivity}
+                <Button onClick={() => {
+                  setTimer(0);
+                  setIsTimerRunning(false);
+                }} className="mt-2 absolute right-0" variant="outline">Stop</Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl text-center mb-4">{formatTime(timer)}</div>
+              <Progress value={(timer / 300) * 100} />
+            </CardContent>
+          </Card>
+        )}
+
+        <Card className="mb-8 bg-white/50">
           <CardHeader>
-            <CardTitle className="text-2xl flex items-center relative">
-              <Timer className="mr-2" />
-              Current Activity: {currentActivity}
-              <Button onClick={()=>{
-                setTimer(0);
-                setIsTimerRunning(false);
-              }} className="mt-2 absolute right-0" variant="outline">Stop</Button>
+            <CardTitle className="text-2xl">
+              Self-Care <span className="text-blue-600">Activities</span>
             </CardTitle>
+            <CardDescription>Explore various activities to improve your well-being</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl text-center mb-4">{formatTime(timer)}</div>
-            <Progress value={(timer / 300) * 100} />
+            <div className="flex flex-wrap gap-2 mb-4">
+              {categories.map(category => (
+                <Badge 
+                  key={category} 
+                  variant={selectedCategory === category ? "destructive" : "outline"}
+                  className="cursor-pointer"
+                  onClick={() => setSelectedCategory(category)}
+                >
+                  {category}
+                </Badge>
+              ))}
+            </div>
+            <Input
+              type="text"
+              placeholder="Search activities..."
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="mb-4"
+            />
+            <ScrollArea className="h-[400px] pr-4">
+              {filteredResources.map((resource, index) => (
+                <Card key={index} className="mb-4 bg-white/50">
+                  <CardHeader>
+                    <CardTitle>
+                      {resource.activity.split(' ').slice(0, 1).join(' ')}{" "}
+                      <span className="text-blue-600">{resource.activity.split(' ').slice(1).join(' ')}</span>
+                    </CardTitle>
+                    <Badge>{resource.category}</Badge>
+                  </CardHeader>
+                  <CardContent>
+                    <p>{resource.description}</p>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button className="mt-2" variant="outline">Try Now</Button>
+                      </DialogTrigger>
+                      <DialogContent className="bg-white/90">
+                        <DialogHeader>
+                          <DialogTitle>
+                            {resource.activity.split(' ').slice(0, 1).join(' ')}{" "}
+                            <span className="text-blue-600">{resource.activity.split(' ').slice(1).join(' ')}</span>
+                          </DialogTitle>
+                          <DialogDescription>{resource.description}</DialogDescription>
+                        </DialogHeader>
+                        {renderActivityContent(resource.action)}
+                      </DialogContent>
+                    </Dialog>
+                  </CardContent>
+                </Card>
+              ))}
+            </ScrollArea>
           </CardContent>
         </Card>
-      )}
 
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="text-2xl">Self-Care Activities</CardTitle>
-          <CardDescription>Explore various activities to improve your well-being</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2 mb-4">
-            {categories.map(category => (
-              <Badge 
-                key={category} 
-                variant={selectedCategory === category ? "destructive" : "outline"}
-                className="cursor-pointer"
-                onClick={() => setSelectedCategory(category)}
-              >
-                {category}
-              </Badge>
+        <Card className="bg-white/50">
+          <CardHeader>
+            <CardTitle className="text-2xl flex items-center">
+              <AlertCircle className="mr-2 text-red-500" />
+              Emergency <span className="text-blue-600 ml-1">Resources</span>
+            </CardTitle>
+            <CardDescription>If you need immediate help, please contact these resources</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {emergencyResources.map((resource, index) => (
+              <div key={index} className="mb-4 last:mb-0">
+                <h3 className="font-semibold text-lg">{resource.name}</h3>
+                <p className="flex items-center mt-1">
+                  <PhoneCall className="mr-2" size={16} />
+                  {resource.phone}
+                </p>
+                <p className="flex items-center mt-1">
+                  <Globe className="mr-2" size={16} />
+                  <a href={resource.website} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                    Visit Website
+                  </a>
+                </p>
+              </div>
             ))}
-          </div>
-          <Input
-            type="text"
-            placeholder="Search activities..."
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="mb-4"
-          />
-          <ScrollArea className="h-[400px] pr-4">
-            {filteredResources.map((resource, index) => (
-              <Card key={index} className="mb-4">
-                <CardHeader>
-                  <CardTitle>{resource.activity}</CardTitle>
-                  <Badge>{resource.category}</Badge>
-                </CardHeader>
-                <CardContent>
-                  <p>{resource.description}</p>
-                  <Dialog >
-                    <DialogTrigger asChild>
-                      <Button className="mt-2" variant="outline">Try Now</Button>
-                    </DialogTrigger>
-                    <DialogContent className="bg-white">
-                      <DialogHeader>
-                        <DialogTitle>{resource.activity}</DialogTitle>
-                        <DialogDescription>{resource.description}</DialogDescription>
-                      </DialogHeader>
-                      {renderActivityContent(resource.action)}
-                    </DialogContent>
-                  </Dialog>
-                </CardContent>
-              </Card>
-            ))}
-          </ScrollArea>
-        </CardContent>
-      </Card>
-
-      
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl flex items-center">
-            <AlertCircle className="mr-2 text-red-500" />
-            Emergency Resources
-          </CardTitle>
-          <CardDescription>If you need immediate help, please contact these resources</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {emergencyResources.map((resource, index) => (
-            <div key={index} className="mb-4 last:mb-0">
-              <h3 className="font-semibold text-lg">{resource.name}</h3>
-              <p className="flex items-center mt-1">
-                <PhoneCall className="mr-2" size={16} />
-                {resource.phone}
-              </p>
-              <p className="flex items-center mt-1">
-                <Globe className="mr-2" size={16} />
-                <a href={resource.website} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-                  Visit Website
-                </a>
-              </p>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

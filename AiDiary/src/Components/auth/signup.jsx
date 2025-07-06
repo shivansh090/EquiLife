@@ -69,18 +69,17 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-background/80 p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f3e8ff] via-[#e0f7fa] to-[#f3e8ff]">
+      <div className="w-full max-w-md bg-glass shadow-xl p-8 rounded-2xl">
         <div className="text-center mb-8">
           <a href="/" className="inline-flex items-center gap-2">
-            <Brain className="h-6 w-6 text-primary" />
-            <span className="text-2xl font-bold">EquiLife</span>
+            <Brain className="h-8 w-8 text-primary" />
+            <span className="text-3xl font-extrabold text-primary">EquiLife</span>
           </a>
         </div>
-
-        <Card>
+        <Card className="card">
           <CardHeader>
-            <CardTitle>Create an account</CardTitle>
+            <CardTitle className="text-2xl text-primary font-bold">Create an account</CardTitle>
             <CardDescription>Start your mental wellness journey today</CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
@@ -104,6 +103,7 @@ export default function SignupPage() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
+                  className="bg-white"
                 />
               </div>
               <div className="space-y-2">
@@ -115,6 +115,7 @@ export default function SignupPage() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
+                  className="bg-white"
                 />
               </div>
               <div className="space-y-2">
@@ -126,6 +127,7 @@ export default function SignupPage() {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
+                  className="bg-white"
                 />
               </div>
               <div className="space-y-2">
@@ -137,11 +139,12 @@ export default function SignupPage() {
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   required
+                  className="bg-white"
                 />
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
-              <Button type="submit" variant="outline" className="outline outline-slate-400 " disabled={loading}>
+              <Button type="submit" className="button-primary w-full" disabled={loading}>
                 {loading ? "Creating account..." : "Sign Up"}
               </Button>
               <p className="text-sm text-center text-muted-foreground">

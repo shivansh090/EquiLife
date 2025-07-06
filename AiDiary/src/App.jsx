@@ -10,6 +10,8 @@ import MoodJournal from './Components/AddDailyActivity/addJournal'
 import Analytics from './Components/MoodAnalytics/analytics'
 import SelfCareResources from './Components/SelfCare/selfCare'
 import MyProfile from './Components/Profile/Profile'
+import AuthPage from './Components/auth/AuthPage';
+import bg from './assets/images/bg.png'; // adjust path if needed
 
 // Custom PrivateRoute component
 function PrivateRoute({ element: Element }) {
@@ -47,12 +49,20 @@ function PrivateRoute({ element: Element }) {
 
 function App() {
   return (
-    <>
+    <div
+      className="min-h-screen w-full"
+      style={{
+        backgroundImage: `url(${bg})`,
+        backgroundSize: "200%",
+        backgroundPosition: "center",
+        backgroundRepeat: "repeat",
+      }}
+    >
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/login" element={<AuthPage />} />
+        <Route path="/signup" element={<AuthPage />} />
 
         {/* Private Routes */}
         <Route path="/dashboard" element={<PrivateRoute element={Dash} />} />
@@ -61,7 +71,7 @@ function App() {
         <Route path="/self-care" element={<PrivateRoute element={SelfCareResources} />} />
         <Route path="/profile" element={<PrivateRoute element={MyProfile} />} />
       </Routes>
-    </>
+    </div>
   );
 }
 

@@ -49,7 +49,7 @@ const MyProfile = () => {
     return (
         <div className="container mx-auto p-8 max-w-6xl">
             <Toaster position="top-center" />
-            <Card>
+            <Card className="bg-white/70"> 
                 <div className='p-10 pb-20'>
                     <div className="flex relative px-6 py-1">
                         <div className="flex justify-end items-end">

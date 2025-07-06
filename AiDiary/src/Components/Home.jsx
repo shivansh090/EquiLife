@@ -1,12 +1,13 @@
-import { Link } from 'react-router-dom'; // Use react-router-dom Link
-import { Button } from '@/Components/ui/button'; // Adjust the imports if necessary
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card'; // Adjust the imports if necessary
-import { Line, LineChart, Bar, BarChart, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts'; // You can use recharts as is
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/Components/ui/chart'; // Adjust imports if necessary
-import { Brain, TrendingUp, Heart, Sparkles, BarChart3, Activity } from 'lucide-react'; // You can use lucide-react icons
+import { Link } from 'react-router-dom';
+import { Button } from '@/Components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Line, LineChart, Bar, BarChart, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/Components/ui/chart';
+import { Brain, TrendingUp, Heart, Sparkles } from 'lucide-react';
 import { activityImpact, moodHistory, moodValues } from './MoodAnalytics/analytics';
+import bg from '../assets/images/bg.png'; // Adjust path if needed
+import { Navbar } from './Navbar'; // Add this import at the top
 
-// Example data for charts
 const demoMoodData = [
   { month: "Jan", positive: 65, negative: 35 },
   { month: "Feb", positive: 70, negative: 30 },
@@ -20,31 +21,23 @@ const demoProgressData = [
   { month: "Jan", progress: 45 },
   { month: "Feb", progress: 52 },
   { month: "Mar", progress: 49 },
-  { month: "Apr", progress: 63 },
+  { month: "Apr", progress:63 },
   { month: "May", progress: 58 },
   { month: "Jun", progress: 72 },
 ];
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen mx-auto bg-gradient-to-b from-background to-background/80">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto flex items-center justify-between p-4">
-          <div className="flex items-center gap-2">
-            <Brain className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">EquiLife</span>
-          </div>
-          <div className="flex items-center gap-4">
-            
-            <Link to="/" className="text-md hidden sm:block hover:text-primary">About Us</Link>
-            <Link to="/dashboard" className="text-md hover:text-primary">Dashboard</Link>
-            <Link to="/login">
-              <Button className="text-md font-bold">Login</Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
+    <div
+      className="min-h-screen mx-auto relative"
+      style={{
+        backgroundImage: `url(${bg})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "repeat", 
+      }}
+    >
+      <Navbar /> {/* Use the common Navbar here */}
 
       {/* Hero Section */}
       <section className="pt-32 pb-20">
@@ -52,57 +45,56 @@ export default function HomePage() {
           <div className="text-center max-w-3xl mx-auto mb-12">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
               Track Your Mental Wellness Journey
-              <span className="text-primary"> Every Day</span>
+              <span className="text-blue-500"> Every Day</span>
             </h1>
-            <p className="text-lg text-muted-foreground mb-8">
+            <p className="text-lg text-gray-600 mb-8">
               Your personal companion for mental health tracking, mood analysis, and self-improvement.
-              Get insights, set goals, and celebrate your progress.
+              <span className="text-blue-600 font-semibold"> Get insights</span>, set goals, and <span className="text-blue-500 font-semibold">celebrate your progress</span>.
             </p>
             <div className="flex justify-center gap-4">
               <Link to="/signup">
-                <Button size="lg" variant="outline" className="border-gray-600"/*className="bg-primary hover:bg-primary/90"*/ >
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-blue-500 text-blue-500 hover:bg-blue-50 hover:border-blue-600 transition-colors font-semibold"
+                >
                   Get Started Free
                 </Button>
               </Link>
-              {/* <Link to="/demo">
-                <Button size="lg" variant="outline">
-                  View Demo
-                </Button>
-              </Link> */}
             </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-muted/50">
+      <section className="py-20 bg-white/80">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            Comprehensive Mental Health Tracking
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
+            <span className="border-b-4 border-blue-200 pb-1">Comprehensive Mental Health Tracking</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="bg-card/50 backdrop-blur">
+            <Card className="bg-white/80 border border-blue-200 shadow-blue-100 shadow-sm hover:shadow-blue-200 transition-shadow">
               <CardHeader>
-                <Heart className="h-8 w-8 text-primary mb-2" />
-                <CardTitle>Mood Tracking</CardTitle>
+                <Heart className="h-8 w-8 text-blue-500 mb-2" />
+                <CardTitle className="text-blue-500">Mood Tracking</CardTitle>
                 <CardDescription>
                   Track your daily moods and emotions with our intuitive journal system
                 </CardDescription>
               </CardHeader>
             </Card>
-            <Card className="bg-card/50 backdrop-blur">
+            <Card className="bg-white/80 border border-blue-200 shadow-blue-100 shadow-sm hover:shadow-blue-200 transition-shadow">
               <CardHeader>
-                <TrendingUp className="h-8 w-8 text-primary mb-2" />
-                <CardTitle>Progress Analytics</CardTitle>
+                <TrendingUp className="h-8 w-8 text-blue-600 mb-2" />
+                <CardTitle className="text-blue-600">Progress Analytics</CardTitle>
                 <CardDescription>
                   Visualize your journey with detailed charts and insights
                 </CardDescription>
               </CardHeader>
             </Card>
-            <Card className="bg-card/50 backdrop-blur">
+            <Card className="bg-white/80 border border-blue-200 shadow-blue-100 shadow-sm hover:shadow-blue-200 transition-shadow">
               <CardHeader>
-                <Sparkles className="h-8 w-8 text-primary mb-2" />
-                <CardTitle>AI-Powered Insights</CardTitle>
+                <Sparkles className="h-8 w-8 text-blue-500 mb-2" />
+                <CardTitle className="text-blue-500">AI-Poweblue Insights</CardTitle>
                 <CardDescription>
                   Get personalized recommendations and activity suggestions
                 </CardDescription>
@@ -115,121 +107,63 @@ export default function HomePage() {
       {/* Demo Charts Section */}
       <section className="py-20">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            Powerful Analytics at Your Fingertips
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
+            <span className="border-b-4 border-blue-200 pb-1">Powerful Analytics at Your Fingertips</span>
           </h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* <Card>
+            <Card className="border border-blue-100 shadow-blue-100 shadow-sm hover:shadow-blue-200 transition-shadow">
               <CardHeader>
-                <CardTitle>Mood Distribution</CardTitle>
-                <CardDescription>Track positive and negative emotions over time</CardDescription>
+                <CardTitle className="text-blue-500">Activity Impact on Mood</CardTitle>
+                <CardDescription>How different activities affect your mood</CardDescription>
               </CardHeader>
-              <CardContent className="h-[300px]">
-                <ChartContainer
-                  config={{
-                    positive: {
-                      label: "Positive",
-                      color: "hsl(var(--primary))",
-                    },
-                    negative: {
-                      label: "Negative",
-                      color: "hsl(var(--destructive))",
-                    },
-                  }}
-                >
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={demoMoodData}>
-                      <XAxis dataKey="month" />
-                      <YAxis />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="positive" fill="#008c21" />
-                      <Bar dataKey="negative" fill="#cf4500" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart data={activityImpact}>
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <Tooltip />
+                    <Bar dataKey="impact" fill="#3b83f6b9" /> {/* blue-500 */}
+                  </BarChart>
+                </ResponsiveContainer>
               </CardContent>
-            </Card> */}
-            {/* <Card>
+            </Card>
+            <Card className="border border-blue-100 shadow-blue-100 shadow-sm hover:shadow-blue-200 transition-shadow">
               <CardHeader>
-                <CardTitle>Progress Trends</CardTitle>
-                <CardDescription>Monitor your improvement journey</CardDescription>
+                <CardTitle className="text-blue-600">Sleep Patterns & Mood Impact</CardTitle>
+                <CardDescription>How sleep affects your mood</CardDescription>
               </CardHeader>
-              <CardContent className="h-[300px]">
-                <ChartContainer
-                  config={{
-                    progress: {
-                      label: "Progress",
-                      color: "hsl(var(--primary))",
-                    },
-                  }}
-                >
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={demoProgressData}>
-                      <XAxis dataKey="month" />
-                      <YAxis />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Line
-                        type="monotone"
-                        dataKey="progress"
-                        stroke="#8884d8"
-                        strokeWidth={2}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={400}>
+                  <LineChart data={moodHistory}>
+                    <XAxis dataKey="day" />
+                    <YAxis yAxisId="left" />
+                    <YAxis yAxisId="right" orientation="right" domain={[0, 5]} tickFormatter={(value) => Object.keys(moodValues).find(key => moodValues[key] === value) || ''} />
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <Tooltip />
+                    <Legend />
+                    <Line yAxisId="left" type="monotone" dataKey="sleep" stroke="#2563eb" strokeWidth={2} name="Sleep Hours" /> {/* blue-600 */}
+                    <Line yAxisId="right" type="monotone" dataKey="mood" stroke="#16a34a" strokeWidth={2} name="Mood" /> {/* blue-600 */}
+                  </LineChart>
+                </ResponsiveContainer>
               </CardContent>
-            </Card> */}
-            <Card>
-          <CardHeader>
-            <CardTitle>Activity Impact on Mood</CardTitle>
-            <CardDescription>How different activities affect your mood</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={activityImpact}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <CartesianGrid strokeDasharray="3 3" />
-                <Tooltip />
-                <Bar dataKey="impact" fill="#2a9d90" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-            <Card>
-          <CardHeader>
-            <CardTitle>Sleep Patterns & Mood Impact</CardTitle>
-            <CardDescription>How sleep affects your mood</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={400}>
-              <LineChart data={moodHistory}>
-                <XAxis dataKey="day" />
-                <YAxis yAxisId="left" />
-                <YAxis yAxisId="right" orientation="right" domain={[0, 5]} tickFormatter={(value) => Object.keys(moodValues).find(key => moodValues[key] === value) || ''} />
-                <CartesianGrid strokeDasharray="3 3" />
-                <Tooltip />
-                <Legend />
-                <Line yAxisId="left" type="monotone" dataKey="sleep" stroke="#8884d8" strokeWidth={2} name="Sleep Hours" />
-                <Line yAxisId="right" type="monotone" dataKey="mood" stroke="#2a9d90" strokeWidth={2} name="Mood" />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+            </Card>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-muted/50">
+      <section className="py-20">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-6">Start Your Journey Today</h2>
-          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+          <h2 className="text-3xl font-bold mb-6 text-gray-900">
+            <span className="border-b-4 border-blue-200 pb-1">Start Your Journey Today</span>
+          </h2>
+          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
             Join thousands of users who are taking control of their mental well-being
             with our comprehensive tracking and analysis tools.
           </p>
           <Link to="/signup">
-            <Button size="lg" className="bg-primary hover:bg-primary/90">
+            <Button size="lg" className="bg-blue-500 hover:bg-blue-600 text-white font-bold shadow-blue-200 shadow-md transition-colors">
               Create Free Account
             </Button>
           </Link>
@@ -237,26 +171,29 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 bg-background">
+      <footer className="py-12 border-t border-blue-100">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <Brain className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold">EquiLife</span>
+              <Brain className="h-6 w-6 text-blue-500" />
+              <span className="text-xl font-bold text-gray-900">
+                Equi<span className="text-blue-500">Life</span>
+                <span className="ml-1 text-blue-500">●</span>
+              </span>
             </div>
             <div className="flex gap-8">
-              <Link to="/privacy" className="text-sm text-muted-foreground hover:text-primary">
+              <Link to="/privacy" className="text-sm text-gray-500 hover:text-blue-500 transition-colors">
                 Privacy Policy
               </Link>
-              <Link to="/terms" className="text-sm text-muted-foreground hover:text-primary">
+              <Link to="/terms" className="text-sm text-gray-500 hover:text-blue-600 transition-colors">
                 Terms of Service
               </Link>
-              <Link to="/contact" className="text-sm text-muted-foreground hover:text-primary">
+              <Link to="/contact" className="text-sm text-gray-500 hover:text-blue-500 transition-colors">
                 Contact Us
               </Link>
             </div>
           </div>
-          <div className="mt-8 text-center text-sm text-muted-foreground">
+          <div className="mt-8 text-center text-sm text-gray-400">
             © {new Date().getFullYear()} EquiLife. All rights reserved.
           </div>
         </div>
