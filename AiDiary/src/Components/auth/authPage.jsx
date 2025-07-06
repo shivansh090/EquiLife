@@ -61,6 +61,7 @@ export default function authPage() {
 
       localStorage.setItem("authToken", data.token);
       localStorage.setItem("user", data.payload.user.id);
+      localStorage.setItem("userName", data.payload.user.username);
 
       if (activeTab === "signup") {
         setSuccess(true);
