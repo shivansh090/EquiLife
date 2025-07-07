@@ -12,10 +12,10 @@ const MyProfile = () => {
     const [editField, setEditField] = useState(null);
 
     const fetchPersonalProfileDetails = () => {
-        const storedProfile = JSON.parse(localStorage.getItem('userProfile')) || {};
+        const storedProfile = (localStorage.getItem('userName')) || {};
         setVerified(storedProfile.verified || false);
         setProfileData([
-            { title: "Name", desc: storedProfile.name || null },
+            { title: "Name", desc: storedProfile|| null },
             { title: "Date of Birth", desc: storedProfile.dateofbirth || null },
             { title: "Phone Number", desc: storedProfile.phonenumber || null },
             { title: "Email", desc: storedProfile.email || null },
