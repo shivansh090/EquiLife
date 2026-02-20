@@ -104,13 +104,13 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-// Connect to MongoDB
-mongoose.connect(process.env.DB_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((error) => console.error('Could not connect to MongoDB...', error));
+// // Connect to MongoDB
+// mongoose.connect(process.env.DB_URL, {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true
+// })
+//   .then(() => console.log('Connected to MongoDB'))
+//   .catch((error) => console.error('Could not connect to MongoDB...', error));
 
 // Import Models
 const User = require('./database/models/User');
@@ -428,6 +428,23 @@ app.get("/mood-trend", authMiddleware, async (req, res) => {
 });
 
 // Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+const startServer = async () => {
+  try {
+    await mongoose.connect(process.env.DB_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+
+    console.log("✅ Connected to MongoDB");
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+
+  } catch (error) {
+    console.error("❌ MongoDB connection failed:", error);
+    process.exit(1); // crash if DB not connected
+  }
+};
+
+startServer();
